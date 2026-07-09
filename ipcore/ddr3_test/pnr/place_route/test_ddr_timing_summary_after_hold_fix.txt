@@ -1,0 +1,112 @@
+Design Summary : All Constraints Met.
+
+Setup Summary(Slow Corner):
+****************************************************************************************************
+                                                                          TNS Failing      TNS Total
+ Launch Clock           Capture Clock              WNS(ns)     TNS(ns)      Endpoints      Endpoints
+----------------------------------------------------------------------------------------------------
+ free_clk               free_clk                    13.597       0.000              0           1405
+ rst_clk                rst_clk                      4.148       0.000              0            562
+ ddrphy_sysclk          ddrphy_sysclk                3.080       0.000              0          18539
+ phy_dq_sysclk_1        ddrphy_sysclk                2.877       0.000              0            260
+ phy_dq_sysclk_0        ddrphy_sysclk                4.233       0.000              0              1
+ ddrphy_sysclk          phy_dq_sysclk_0              1.394       0.000              0            196
+ ddrphy_sysclk          phy_dq_sysclk_1              1.942       0.000              0            420
+====================================================================================================
+
+Hold Summary(Slow Corner):
+****************************************************************************************************
+                                                                          THS Failing      THS Total
+ Launch Clock           Capture Clock              WHS(ns)     THS(ns)      Endpoints      Endpoints
+----------------------------------------------------------------------------------------------------
+ free_clk               free_clk                     0.159       0.000              0           1405
+ rst_clk                rst_clk                      0.257       0.000              0            562
+ ddrphy_sysclk          ddrphy_sysclk                0.138       0.000              0          18539
+ phy_dq_sysclk_1        ddrphy_sysclk                0.650       0.000              0            260
+ phy_dq_sysclk_0        ddrphy_sysclk                0.891       0.000              0              1
+ ddrphy_sysclk          phy_dq_sysclk_0              0.418       0.000              0            196
+ ddrphy_sysclk          phy_dq_sysclk_1              0.516       0.000              0            420
+====================================================================================================
+
+Recovery Summary(Slow Corner):
+****************************************************************************************************
+                                                                          TNS Failing      TNS Total
+ Launch Clock           Capture Clock              WNS(ns)     TNS(ns)      Endpoints      Endpoints
+----------------------------------------------------------------------------------------------------
+ free_clk               free_clk                    16.610       0.000              0            575
+ rst_clk                rst_clk                      5.217       0.000              0            121
+ ddrphy_sysclk          ddrphy_sysclk                4.883       0.000              0           4870
+====================================================================================================
+
+Removal Summary(Slow Corner):
+****************************************************************************************************
+                                                                          THS Failing      THS Total
+ Launch Clock           Capture Clock              WHS(ns)     THS(ns)      Endpoints      Endpoints
+----------------------------------------------------------------------------------------------------
+ free_clk               free_clk                     0.991       0.000              0            575
+ rst_clk                rst_clk                      0.435       0.000              0            121
+ ddrphy_sysclk          ddrphy_sysclk                0.314       0.000              0           4870
+====================================================================================================
+
+Minimum Pulse Width Summary(Slow Corner):
+****************************************************************************************************
+                                                                         WPWS Failing     WPWS Total
+ Clock                                            WPWS(ns)    TPWS(ns)      Endpoints      Endpoints
+----------------------------------------------------------------------------------------------------
+====================================================================================================
+
+Setup Summary(Fast Corner):
+****************************************************************************************************
+                                                                          TNS Failing      TNS Total
+ Launch Clock           Capture Clock              WNS(ns)     TNS(ns)      Endpoints      Endpoints
+----------------------------------------------------------------------------------------------------
+ free_clk               free_clk                    16.122       0.000              0           1405
+ rst_clk                rst_clk                      5.636       0.000              0            562
+ ddrphy_sysclk          ddrphy_sysclk                4.874       0.000              0          18539
+ phy_dq_sysclk_1        ddrphy_sysclk                4.407       0.000              0            260
+ phy_dq_sysclk_0        ddrphy_sysclk                5.264       0.000              0              1
+ ddrphy_sysclk          phy_dq_sysclk_0              3.563       0.000              0            196
+ ddrphy_sysclk          phy_dq_sysclk_1              3.942       0.000              0            420
+====================================================================================================
+
+Hold Summary(Fast Corner):
+****************************************************************************************************
+                                                                          THS Failing      THS Total
+ Launch Clock           Capture Clock              WHS(ns)     THS(ns)      Endpoints      Endpoints
+----------------------------------------------------------------------------------------------------
+ free_clk               free_clk                     0.116       0.000              0           1405
+ rst_clk                rst_clk                      0.167       0.000              0            562
+ ddrphy_sysclk          ddrphy_sysclk                0.101       0.000              0          18539
+ phy_dq_sysclk_1        ddrphy_sysclk                0.110       0.000              0            260
+ phy_dq_sysclk_0        ddrphy_sysclk                0.271       0.000              0              1
+ ddrphy_sysclk          phy_dq_sysclk_0              0.105       0.000              0            196
+ ddrphy_sysclk          phy_dq_sysclk_1              0.118       0.000              0            420
+====================================================================================================
+
+Recovery Summary(Fast Corner):
+****************************************************************************************************
+                                                                          TNS Failing      TNS Total
+ Launch Clock           Capture Clock              WNS(ns)     TNS(ns)      Endpoints      Endpoints
+----------------------------------------------------------------------------------------------------
+ free_clk               free_clk                    17.846       0.000              0            575
+ rst_clk                rst_clk                      6.197       0.000              0            121
+ ddrphy_sysclk          ddrphy_sysclk                5.913       0.000              0           4870
+====================================================================================================
+
+Removal Summary(Fast Corner):
+****************************************************************************************************
+                                                                          THS Failing      THS Total
+ Launch Clock           Capture Clock              WHS(ns)     THS(ns)      Endpoints      Endpoints
+----------------------------------------------------------------------------------------------------
+ free_clk               free_clk                     0.684       0.000              0            575
+ rst_clk                rst_clk                      0.299       0.000              0            121
+ ddrphy_sysclk          ddrphy_sysclk                0.219       0.000              0           4870
+====================================================================================================
+
+Minimum Pulse Width Summary(Fast Corner):
+****************************************************************************************************
+                                                                         WPWS Failing     WPWS Total
+ Clock                                            WPWS(ns)    TPWS(ns)      Endpoints      Endpoints
+----------------------------------------------------------------------------------------------------
+====================================================================================================
+

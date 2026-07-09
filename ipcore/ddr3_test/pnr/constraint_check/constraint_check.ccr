@@ -1,0 +1,135 @@
+##### Written on 2024/06/14 11:38:56 ###############################
+
+
+##### INFO ##################################################
+
+Current device : 
+	PG2L100H-6FBG676
+
+Top Module : 
+	test_ddr
+
+Constraint File(s) : 
+	D:/admin/desktop/2L100H_676/ddr3_test/ddr3_test/ipcore/ddr3_test/pnr/ddr_test.fdc
+
+##### SUMMARY ######################################################
+
+Found 0 error(s), 15 critical warning(s), 17 warning(s), out of 603 constraint(s)
+
+
+Inapplicable constraints(except overwritten constraints):
+********************************************
+
+define_attribute {p:free_clk} {PAP_IO_DIRECTION} {INPUT}
+	W: ConstraintEditor-4026: [D:/admin/desktop/2L100H_676/ddr3_test/ddr3_test/ipcore/ddr3_test/pnr/ddr_test.fdc(line number: 788)] PAP_IO_DIRECTION is already defined in p:free_clk, new value INPUT will overwrite the current value.
+
+define_attribute {p:free_clk} {PAP_IO_LOC} {D18}
+	W: ConstraintEditor-4026: [D:/admin/desktop/2L100H_676/ddr3_test/ddr3_test/ipcore/ddr3_test/pnr/ddr_test.fdc(line number: 789)] PAP_IO_LOC is already defined in p:free_clk, new value D18 will overwrite the current value.
+
+define_attribute {p:free_clk} {PAP_IO_VCCIO} {3.3}
+	W: ConstraintEditor-4026: [D:/admin/desktop/2L100H_676/ddr3_test/ddr3_test/ipcore/ddr3_test/pnr/ddr_test.fdc(line number: 790)] PAP_IO_VCCIO is already defined in p:free_clk, new value 3.3 will overwrite the current value.
+
+define_attribute {p:free_clk} {PAP_IO_STANDARD} {LVCMOS33}
+	W: ConstraintEditor-4026: [D:/admin/desktop/2L100H_676/ddr3_test/ddr3_test/ipcore/ddr3_test/pnr/ddr_test.fdc(line number: 791)] PAP_IO_STANDARD is already defined in p:free_clk, new value LVCMOS33 will overwrite the current value.
+
+define_attribute {p:free_clk} {PAP_IO_NONE} {TRUE}
+	W: ConstraintEditor-4026: [D:/admin/desktop/2L100H_676/ddr3_test/ddr3_test/ipcore/ddr3_test/pnr/ddr_test.fdc(line number: 792)] PAP_IO_NONE is already defined in p:free_clk, new value TRUE will overwrite the current value.
+
+define_attribute {p:uart_txd} {PAP_IO_DIRECTION} {OUTPUT}
+	W: ConstraintEditor-4026: [D:/admin/desktop/2L100H_676/ddr3_test/ddr3_test/ipcore/ddr3_test/pnr/ddr_test.fdc(line number: 1297)] PAP_IO_DIRECTION is already defined in p:uart_txd, new value OUTPUT will overwrite the current value.
+
+define_attribute {p:uart_txd} {PAP_IO_LOC} {C24}
+	W: ConstraintEditor-4026: [D:/admin/desktop/2L100H_676/ddr3_test/ddr3_test/ipcore/ddr3_test/pnr/ddr_test.fdc(line number: 1298)] PAP_IO_LOC is already defined in p:uart_txd, new value C24 will overwrite the current value.
+
+define_attribute {p:uart_txd} {PAP_IO_VCCIO} {3.3}
+	W: ConstraintEditor-4026: [D:/admin/desktop/2L100H_676/ddr3_test/ddr3_test/ipcore/ddr3_test/pnr/ddr_test.fdc(line number: 1299)] PAP_IO_VCCIO is already defined in p:uart_txd, new value 3.3 will overwrite the current value.
+
+define_attribute {p:uart_txd} {PAP_IO_STANDARD} {LVCMOS33}
+	W: ConstraintEditor-4026: [D:/admin/desktop/2L100H_676/ddr3_test/ddr3_test/ipcore/ddr3_test/pnr/ddr_test.fdc(line number: 1300)] PAP_IO_STANDARD is already defined in p:uart_txd, new value LVCMOS33 will overwrite the current value.
+
+define_attribute {p:uart_txd} {PAP_IO_DRIVE} {8}
+	W: ConstraintEditor-4026: [D:/admin/desktop/2L100H_676/ddr3_test/ddr3_test/ipcore/ddr3_test/pnr/ddr_test.fdc(line number: 1301)] PAP_IO_DRIVE is already defined in p:uart_txd, new value 8 will overwrite the current value.
+
+define_attribute {p:uart_txd} {PAP_IO_NONE} {TRUE}
+	W: ConstraintEditor-4026: [D:/admin/desktop/2L100H_676/ddr3_test/ddr3_test/ipcore/ddr3_test/pnr/ddr_test.fdc(line number: 1302)] PAP_IO_NONE is already defined in p:uart_txd, new value TRUE will overwrite the current value.
+
+define_attribute {p:uart_txd} {PAP_IO_SLEW} {SLOW}
+	W: ConstraintEditor-4026: [D:/admin/desktop/2L100H_676/ddr3_test/ddr3_test/ipcore/ddr3_test/pnr/ddr_test.fdc(line number: 1303)] PAP_IO_SLEW is already defined in p:uart_txd, new value SLOW will overwrite the current value.
+
+define_attribute {p:uart_rxd} {PAP_IO_DIRECTION} {INPUT}
+	W: ConstraintEditor-4026: [D:/admin/desktop/2L100H_676/ddr3_test/ddr3_test/ipcore/ddr3_test/pnr/ddr_test.fdc(line number: 1309)] PAP_IO_DIRECTION is already defined in p:uart_rxd, new value INPUT will overwrite the current value.
+
+define_attribute {p:uart_rxd} {PAP_IO_LOC} {B24}
+	W: ConstraintEditor-4026: [D:/admin/desktop/2L100H_676/ddr3_test/ddr3_test/ipcore/ddr3_test/pnr/ddr_test.fdc(line number: 1310)] PAP_IO_LOC is already defined in p:uart_rxd, new value B24 will overwrite the current value.
+
+define_attribute {p:uart_rxd} {PAP_IO_VCCIO} {3.3}
+	W: ConstraintEditor-4026: [D:/admin/desktop/2L100H_676/ddr3_test/ddr3_test/ipcore/ddr3_test/pnr/ddr_test.fdc(line number: 1311)] PAP_IO_VCCIO is already defined in p:uart_rxd, new value 3.3 will overwrite the current value.
+
+define_attribute {p:uart_rxd} {PAP_IO_STANDARD} {LVCMOS33}
+	W: ConstraintEditor-4026: [D:/admin/desktop/2L100H_676/ddr3_test/ddr3_test/ipcore/ddr3_test/pnr/ddr_test.fdc(line number: 1312)] PAP_IO_STANDARD is already defined in p:uart_rxd, new value LVCMOS33 will overwrite the current value.
+
+define_attribute {p:uart_rxd} {PAP_IO_PULLUP} {TRUE}       
+	W: ConstraintEditor-4031: [D:/admin/desktop/2L100H_676/ddr3_test/ddr3_test/ipcore/ddr3_test/pnr/ddr_test.fdc(line number: 786)] BUS_KEEPER attribute have been defined already, current attribute PAP_IO_NONE will overwrite the old attribute PAP_IO_PULLUP.
+
+define_attribute {p:mem_dq[15]} {PAP_IO_LOC} {G6}
+	C: ConstraintEditor-2002: [D:/admin/desktop/2L100H_676/ddr3_test/ddr3_test/ipcore/ddr3_test/pnr/ddr_test.fdc(line number: 906)] | Port mem_dq[15] has been placed at location G6, whose type is share pin.
+
+define_attribute {p:mem_dq[13]} {PAP_IO_LOC} {E6}
+	C: ConstraintEditor-2002: [D:/admin/desktop/2L100H_676/ddr3_test/ddr3_test/ipcore/ddr3_test/pnr/ddr_test.fdc(line number: 920)] | Port mem_dq[13] has been placed at location E6, whose type is share pin.
+
+define_attribute {p:mem_dq[12]} {PAP_IO_LOC} {G8}
+	C: ConstraintEditor-2002: [D:/admin/desktop/2L100H_676/ddr3_test/ddr3_test/ipcore/ddr3_test/pnr/ddr_test.fdc(line number: 927)] | Port mem_dq[12] has been placed at location G8, whose type is share pin.
+
+define_attribute {p:mem_dq[11]} {PAP_IO_LOC} {D6}
+	C: ConstraintEditor-2002: [D:/admin/desktop/2L100H_676/ddr3_test/ddr3_test/ipcore/ddr3_test/pnr/ddr_test.fdc(line number: 934)] | Port mem_dq[11] has been placed at location D6, whose type is share pin.
+
+define_attribute {p:mem_dq[10]} {PAP_IO_LOC} {H8}
+	C: ConstraintEditor-2002: [D:/admin/desktop/2L100H_676/ddr3_test/ddr3_test/ipcore/ddr3_test/pnr/ddr_test.fdc(line number: 941)] | Port mem_dq[10] has been placed at location H8, whose type is share pin.
+
+define_attribute {p:mem_dq[8]} {PAP_IO_LOC} {H6}
+	C: ConstraintEditor-2002: [D:/admin/desktop/2L100H_676/ddr3_test/ddr3_test/ipcore/ddr3_test/pnr/ddr_test.fdc(line number: 955)] | Port mem_dq[8] has been placed at location H6, whose type is share pin.
+
+define_attribute {p:mem_dq[7]} {PAP_IO_LOC} {J5}
+	C: ConstraintEditor-2002: [D:/admin/desktop/2L100H_676/ddr3_test/ddr3_test/ipcore/ddr3_test/pnr/ddr_test.fdc(line number: 962)] | Port mem_dq[7] has been placed at location J5, whose type is share pin.
+
+define_attribute {p:mem_dq[5]} {PAP_IO_LOC} {K7}
+	C: ConstraintEditor-2002: [D:/admin/desktop/2L100H_676/ddr3_test/ddr3_test/ipcore/ddr3_test/pnr/ddr_test.fdc(line number: 976)] | Port mem_dq[5] has been placed at location K7, whose type is share pin.
+
+define_attribute {p:mem_dq[3]} {PAP_IO_LOC} {L8}
+	C: ConstraintEditor-2002: [D:/admin/desktop/2L100H_676/ddr3_test/ddr3_test/ipcore/ddr3_test/pnr/ddr_test.fdc(line number: 990)] | Port mem_dq[3] has been placed at location L8, whose type is share pin.
+
+define_attribute {p:mem_dq[1]} {PAP_IO_LOC} {J6}
+	C: ConstraintEditor-2002: [D:/admin/desktop/2L100H_676/ddr3_test/ddr3_test/ipcore/ddr3_test/pnr/ddr_test.fdc(line number: 1004)] | Port mem_dq[1] has been placed at location J6, whose type is share pin.
+
+define_attribute {p:mem_dqs[1]} {PAP_IO_LOC} {H7}
+	C: ConstraintEditor-2002: [D:/admin/desktop/2L100H_676/ddr3_test/ddr3_test/ipcore/ddr3_test/pnr/ddr_test.fdc(line number: 1137)] | Port mem_dqs[1] has been placed at location H7, whose type is share pin.
+
+define_attribute {p:mem_dqs[0]} {PAP_IO_LOC} {J4}
+	C: ConstraintEditor-2002: [D:/admin/desktop/2L100H_676/ddr3_test/ddr3_test/ipcore/ddr3_test/pnr/ddr_test.fdc(line number: 1144)] | Port mem_dqs[0] has been placed at location J4, whose type is share pin.
+
+define_attribute {p:mem_dqs_n[1]} {PAP_IO_LOC} {G7}
+	C: ConstraintEditor-2002: [D:/admin/desktop/2L100H_676/ddr3_test/ddr3_test/ipcore/ddr3_test/pnr/ddr_test.fdc(line number: 1165)] | Port mem_dqs_n[1] has been placed at location G7, whose type is share pin.
+
+define_attribute {p:mem_dqs_n[0]} {PAP_IO_LOC} {H4}
+	C: ConstraintEditor-2002: [D:/admin/desktop/2L100H_676/ddr3_test/ddr3_test/ipcore/ddr3_test/pnr/ddr_test.fdc(line number: 1172)] | Port mem_dqs_n[0] has been placed at location H4, whose type is share pin.
+
+define_attribute {p:mem_dm[0]} {PAP_IO_LOC} {K6}
+	C: ConstraintEditor-2002: [D:/admin/desktop/2L100H_676/ddr3_test/ddr3_test/ipcore/ddr3_test/pnr/ddr_test.fdc(line number: 1221)] | Port mem_dm[0] has been placed at location K6, whose type is share pin.
+
+
+Constraints with issues:
+********************************************
+
+
+Issues without commands:
+********************************************
+
+
+Unconstrained ports:
+********************************************
+
+
+Constraints with matching wildcard expressions:
+********************************************
+
+

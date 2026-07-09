@@ -1,0 +1,2 @@
+def_route -prior_net {I_ips_ddr_top/u_ddrphy_top/ddrphy_ioclk_gate [0]}
+def_route -prior_net {I_ips_ddr_top/u_ddrphy_top/ddrphy_ioclk_gate [1]}

@@ -1,0 +1,263 @@
+##### Written on 2026/07/09 11:22:29 ###############################
+
+
+##### INFO ##################################################
+
+Current device : 
+	PG2L100H-6FBG676
+
+Top Module : 
+	system_top
+
+Constraint File(s) : 
+	D:/PDS/test/Sparrow_RISC-V/soc.fdc
+
+##### SUMMARY ######################################################
+
+Found 0 error(s), 58 critical warning(s), 39 warning(s), out of 1090 constraint(s)
+
+
+Inapplicable constraints(except overwritten constraints):
+********************************************
+
+define_attribute {p:sys_clk} {PAP_IO_DIRECTION} {INPUT}
+	W: ConstraintEditor-4026: [D:/PDS/test/Sparrow_RISC-V/soc.fdc(line number: 1367)] PAP_IO_DIRECTION is already defined in p:sys_clk, new value INPUT will overwrite the current value.
+
+define_attribute {p:sys_clk} {PAP_IO_LOC} {D18}
+	W: ConstraintEditor-4026: [D:/PDS/test/Sparrow_RISC-V/soc.fdc(line number: 1368)] PAP_IO_LOC is already defined in p:sys_clk, new value D18 will overwrite the current value.
+
+define_attribute {p:sys_clk} {PAP_IO_VCCIO} {3.3}
+	W: ConstraintEditor-4026: [D:/PDS/test/Sparrow_RISC-V/soc.fdc(line number: 1369)] PAP_IO_VCCIO is already defined in p:sys_clk, new value 3.3 will overwrite the current value.
+
+define_attribute {p:sys_clk} {PAP_IO_STANDARD} {LVCMOS33}
+	W: ConstraintEditor-4026: [D:/PDS/test/Sparrow_RISC-V/soc.fdc(line number: 1370)] PAP_IO_STANDARD is already defined in p:sys_clk, new value LVCMOS33 will overwrite the current value.
+
+define_attribute {p:sys_clk} {PAP_IO_NONE} {TRUE}
+	W: ConstraintEditor-4026: [D:/PDS/test/Sparrow_RISC-V/soc.fdc(line number: 1371)] PAP_IO_NONE is already defined in p:sys_clk, new value TRUE will overwrite the current value.
+
+define_attribute {p:b_out[7]} {PAP_IO_LOC} {T22}
+	C: ConstraintEditor-2002: [D:/PDS/test/Sparrow_RISC-V/soc.fdc(line number: 316)] | Port b_out[7] has been placed at location T22, whose type is share pin.
+
+define_attribute {p:b_out[6]} {PAP_IO_LOC} {R22}
+	C: ConstraintEditor-2002: [D:/PDS/test/Sparrow_RISC-V/soc.fdc(line number: 323)] | Port b_out[6] has been placed at location R22, whose type is share pin.
+
+define_attribute {p:b_out[5]} {PAP_IO_LOC} {N18}
+	C: ConstraintEditor-2002: [D:/PDS/test/Sparrow_RISC-V/soc.fdc(line number: 330)] | Port b_out[5] has been placed at location N18, whose type is share pin.
+
+define_attribute {p:b_out[0]} {PAP_IO_LOC} {P19}
+	C: ConstraintEditor-2002: [D:/PDS/test/Sparrow_RISC-V/soc.fdc(line number: 365)] | Port b_out[0] has been placed at location P19, whose type is share pin.
+
+define_attribute {p:g_out[6]} {PAP_IO_LOC} {N23}
+	C: ConstraintEditor-2002: [D:/PDS/test/Sparrow_RISC-V/soc.fdc(line number: 379)] | Port g_out[6] has been placed at location N23, whose type is share pin.
+
+define_attribute {p:g_out[5]} {PAP_IO_LOC} {N24}
+	C: ConstraintEditor-2002: [D:/PDS/test/Sparrow_RISC-V/soc.fdc(line number: 386)] | Port g_out[5] has been placed at location N24, whose type is share pin.
+
+define_attribute {p:g_out[4]} {PAP_IO_LOC} {P23}
+	C: ConstraintEditor-2002: [D:/PDS/test/Sparrow_RISC-V/soc.fdc(line number: 393)] | Port g_out[4] has been placed at location P23, whose type is share pin.
+
+define_attribute {p:g_out[3]} {PAP_IO_LOC} {P24}
+	C: ConstraintEditor-2002: [D:/PDS/test/Sparrow_RISC-V/soc.fdc(line number: 400)] | Port g_out[3] has been placed at location P24, whose type is share pin.
+
+define_attribute {p:g_out[2]} {PAP_IO_LOC} {R25}
+	C: ConstraintEditor-2002: [D:/PDS/test/Sparrow_RISC-V/soc.fdc(line number: 407)] | Port g_out[2] has been placed at location R25, whose type is share pin.
+
+define_attribute {p:g_out[1]} {PAP_IO_LOC} {P25}
+	C: ConstraintEditor-2002: [D:/PDS/test/Sparrow_RISC-V/soc.fdc(line number: 414)] | Port g_out[1] has been placed at location P25, whose type is share pin.
+
+define_attribute {p:g_out[0]} {PAP_IO_LOC} {T25}
+	C: ConstraintEditor-2002: [D:/PDS/test/Sparrow_RISC-V/soc.fdc(line number: 421)] | Port g_out[0] has been placed at location T25, whose type is share pin.
+
+define_attribute {p:r_out[7]} {PAP_IO_LOC} {P16}
+	C: ConstraintEditor-2002: [D:/PDS/test/Sparrow_RISC-V/soc.fdc(line number: 428)] | Port r_out[7] has been placed at location P16, whose type is share pin.
+
+define_attribute {p:r_out[6]} {PAP_IO_LOC} {K25}
+	C: ConstraintEditor-2002: [D:/PDS/test/Sparrow_RISC-V/soc.fdc(line number: 435)] | Port r_out[6] has been placed at location K25, whose type is share pin.
+
+define_attribute {p:r_out[5]} {PAP_IO_LOC} {K26}
+	C: ConstraintEditor-2002: [D:/PDS/test/Sparrow_RISC-V/soc.fdc(line number: 442)] | Port r_out[5] has been placed at location K26, whose type is share pin.
+
+define_attribute {p:r_out[3]} {PAP_IO_LOC} {L25}
+	C: ConstraintEditor-2002: [D:/PDS/test/Sparrow_RISC-V/soc.fdc(line number: 456)] | Port r_out[3] has been placed at location L25, whose type is share pin.
+
+define_attribute {p:de_out} {PAP_IO_LOC} {N19}
+	C: ConstraintEditor-2002: [D:/PDS/test/Sparrow_RISC-V/soc.fdc(line number: 485)] | Port de_out has been placed at location N19, whose type is share pin.
+
+define_attribute {p:hs_out} {PAP_IO_LOC} {R20}
+	C: ConstraintEditor-2002: [D:/PDS/test/Sparrow_RISC-V/soc.fdc(line number: 493)] | Port hs_out has been placed at location R20, whose type is share pin.
+
+define_attribute {p:rstn_out} {PAP_IO_LOC} {G25}
+	C: ConstraintEditor-2002: [D:/PDS/test/Sparrow_RISC-V/soc.fdc(line number: 512)] | Port rstn_out has been placed at location G25, whose type is share pin.
+
+define_attribute {p:vs_out} {PAP_IO_LOC} {R21}
+	C: ConstraintEditor-2002: [D:/PDS/test/Sparrow_RISC-V/soc.fdc(line number: 594)] | Port vs_out has been placed at location R21, whose type is share pin.
+
+define_attribute {p:mem_dq[15]} {PAP_IO_LOC} {G6}
+	C: ConstraintEditor-2002: [D:/PDS/test/Sparrow_RISC-V/soc.fdc(line number: 722)] | Port mem_dq[15] has been placed at location G6, whose type is share pin.
+
+define_attribute {p:mem_dq[13]} {PAP_IO_LOC} {E6}
+	C: ConstraintEditor-2002: [D:/PDS/test/Sparrow_RISC-V/soc.fdc(line number: 736)] | Port mem_dq[13] has been placed at location E6, whose type is share pin.
+
+define_attribute {p:mem_dq[12]} {PAP_IO_LOC} {G8}
+	C: ConstraintEditor-2002: [D:/PDS/test/Sparrow_RISC-V/soc.fdc(line number: 743)] | Port mem_dq[12] has been placed at location G8, whose type is share pin.
+
+define_attribute {p:mem_dq[11]} {PAP_IO_LOC} {D6}
+	C: ConstraintEditor-2002: [D:/PDS/test/Sparrow_RISC-V/soc.fdc(line number: 750)] | Port mem_dq[11] has been placed at location D6, whose type is share pin.
+
+define_attribute {p:mem_dq[10]} {PAP_IO_LOC} {H8}
+	C: ConstraintEditor-2002: [D:/PDS/test/Sparrow_RISC-V/soc.fdc(line number: 757)] | Port mem_dq[10] has been placed at location H8, whose type is share pin.
+
+define_attribute {p:mem_dq[8]} {PAP_IO_LOC} {H6}
+	C: ConstraintEditor-2002: [D:/PDS/test/Sparrow_RISC-V/soc.fdc(line number: 771)] | Port mem_dq[8] has been placed at location H6, whose type is share pin.
+
+define_attribute {p:mem_dq[7]} {PAP_IO_LOC} {J5}
+	C: ConstraintEditor-2002: [D:/PDS/test/Sparrow_RISC-V/soc.fdc(line number: 778)] | Port mem_dq[7] has been placed at location J5, whose type is share pin.
+
+define_attribute {p:mem_dq[5]} {PAP_IO_LOC} {K7}
+	C: ConstraintEditor-2002: [D:/PDS/test/Sparrow_RISC-V/soc.fdc(line number: 792)] | Port mem_dq[5] has been placed at location K7, whose type is share pin.
+
+define_attribute {p:mem_dq[3]} {PAP_IO_LOC} {L8}
+	C: ConstraintEditor-2002: [D:/PDS/test/Sparrow_RISC-V/soc.fdc(line number: 806)] | Port mem_dq[3] has been placed at location L8, whose type is share pin.
+
+define_attribute {p:mem_dq[1]} {PAP_IO_LOC} {J6}
+	C: ConstraintEditor-2002: [D:/PDS/test/Sparrow_RISC-V/soc.fdc(line number: 820)] | Port mem_dq[1] has been placed at location J6, whose type is share pin.
+
+define_attribute {p:mem_dqs[1]} {PAP_IO_LOC} {H7}
+	C: ConstraintEditor-2002: [D:/PDS/test/Sparrow_RISC-V/soc.fdc(line number: 953)] | Port mem_dqs[1] has been placed at location H7, whose type is share pin.
+
+define_attribute {p:mem_dqs[0]} {PAP_IO_LOC} {J4}
+	C: ConstraintEditor-2002: [D:/PDS/test/Sparrow_RISC-V/soc.fdc(line number: 960)] | Port mem_dqs[0] has been placed at location J4, whose type is share pin.
+
+define_attribute {p:mem_dqs_n[1]} {PAP_IO_LOC} {G7}
+	C: ConstraintEditor-2002: [D:/PDS/test/Sparrow_RISC-V/soc.fdc(line number: 981)] | Port mem_dqs_n[1] has been placed at location G7, whose type is share pin.
+
+define_attribute {p:mem_dqs_n[0]} {PAP_IO_LOC} {H4}
+	C: ConstraintEditor-2002: [D:/PDS/test/Sparrow_RISC-V/soc.fdc(line number: 988)] | Port mem_dqs_n[0] has been placed at location H4, whose type is share pin.
+
+define_attribute {p:mem_dm[0]} {PAP_IO_LOC} {K6}
+	C: ConstraintEditor-2002: [D:/PDS/test/Sparrow_RISC-V/soc.fdc(line number: 1037)] | Port mem_dm[0] has been placed at location K6, whose type is share pin.
+
+define_attribute {p:b_in[4]} {PAP_IO_LOC} {L17}
+	C: ConstraintEditor-2002: [D:/PDS/test/Sparrow_RISC-V/soc.fdc(line number: 1200)] | Port b_in[4] has been placed at location L17, whose type is share pin.
+
+define_attribute {p:b_in[3]} {PAP_IO_LOC} {H18}
+	C: ConstraintEditor-2002: [D:/PDS/test/Sparrow_RISC-V/soc.fdc(line number: 1205)] | Port b_in[3] has been placed at location H18, whose type is share pin.
+
+define_attribute {p:b_in[2]} {PAP_IO_LOC} {J18}
+	C: ConstraintEditor-2002: [D:/PDS/test/Sparrow_RISC-V/soc.fdc(line number: 1210)] | Port b_in[2] has been placed at location J18, whose type is share pin.
+
+define_attribute {p:b_in[0]} {PAP_IO_LOC} {L18}
+	C: ConstraintEditor-2002: [D:/PDS/test/Sparrow_RISC-V/soc.fdc(line number: 1220)] | Port b_in[0] has been placed at location L18, whose type is share pin.
+
+define_attribute {p:g_in[7]} {PAP_IO_LOC} {L15}
+	C: ConstraintEditor-2002: [D:/PDS/test/Sparrow_RISC-V/soc.fdc(line number: 1225)] | Port g_in[7] has been placed at location L15, whose type is share pin.
+
+define_attribute {p:g_in[6]} {PAP_IO_LOC} {K16}
+	C: ConstraintEditor-2002: [D:/PDS/test/Sparrow_RISC-V/soc.fdc(line number: 1230)] | Port g_in[6] has been placed at location K16, whose type is share pin.
+
+define_attribute {p:g_in[5]} {PAP_IO_LOC} {K17}
+	C: ConstraintEditor-2002: [D:/PDS/test/Sparrow_RISC-V/soc.fdc(line number: 1235)] | Port g_in[5] has been placed at location K17, whose type is share pin.
+
+define_attribute {p:g_in[4]} {PAP_IO_LOC} {K15}
+	C: ConstraintEditor-2002: [D:/PDS/test/Sparrow_RISC-V/soc.fdc(line number: 1240)] | Port g_in[4] has been placed at location K15, whose type is share pin.
+
+define_attribute {p:g_in[3]} {PAP_IO_LOC} {J16}
+	C: ConstraintEditor-2002: [D:/PDS/test/Sparrow_RISC-V/soc.fdc(line number: 1245)] | Port g_in[3] has been placed at location J16, whose type is share pin.
+
+define_attribute {p:g_in[2]} {PAP_IO_LOC} {J15}
+	C: ConstraintEditor-2002: [D:/PDS/test/Sparrow_RISC-V/soc.fdc(line number: 1250)] | Port g_in[2] has been placed at location J15, whose type is share pin.
+
+define_attribute {p:g_in[1]} {PAP_IO_LOC} {J14}
+	C: ConstraintEditor-2002: [D:/PDS/test/Sparrow_RISC-V/soc.fdc(line number: 1255)] | Port g_in[1] has been placed at location J14, whose type is share pin.
+
+define_attribute {p:r_in[4]} {PAP_IO_LOC} {K20}
+	C: ConstraintEditor-2002: [D:/PDS/test/Sparrow_RISC-V/soc.fdc(line number: 1280)] | Port r_in[4] has been placed at location K20, whose type is share pin.
+
+define_attribute {p:r_in[3]} {PAP_IO_LOC} {J20}
+	C: ConstraintEditor-2002: [D:/PDS/test/Sparrow_RISC-V/soc.fdc(line number: 1285)] | Port r_in[3] has been placed at location J20, whose type is share pin.
+
+define_attribute {p:r_in[2]} {PAP_IO_LOC} {J19}
+	C: ConstraintEditor-2002: [D:/PDS/test/Sparrow_RISC-V/soc.fdc(line number: 1290)] | Port r_in[2] has been placed at location J19, whose type is share pin.
+
+define_attribute {p:r_in[1]} {PAP_IO_LOC} {H19}
+	C: ConstraintEditor-2002: [D:/PDS/test/Sparrow_RISC-V/soc.fdc(line number: 1295)] | Port r_in[1] has been placed at location H19, whose type is share pin.
+
+define_attribute {p:r_in[0]} {PAP_IO_LOC} {M15}
+	C: ConstraintEditor-2002: [D:/PDS/test/Sparrow_RISC-V/soc.fdc(line number: 1300)] | Port r_in[0] has been placed at location M15, whose type is share pin.
+
+define_attribute {p:vs_in} {PAP_IO_LOC} {H24}
+	C: ConstraintEditor-2002: [D:/PDS/test/Sparrow_RISC-V/soc.fdc(line number: 1323)] | Port vs_in has been placed at location H24, whose type is share pin.
+
+define_attribute {p:iic_tx_sda} {PAP_IO_LOC} {K23}
+	C: ConstraintEditor-2002: [D:/PDS/test/Sparrow_RISC-V/soc.fdc(line number: 1329)] | Port iic_tx_sda has been placed at location K23, whose type is share pin.
+
+define_attribute {p:iic_tx_scl} {PAP_IO_LOC} {K22}
+	C: ConstraintEditor-2002: [D:/PDS/test/Sparrow_RISC-V/soc.fdc(line number: 1343)] | Port iic_tx_scl has been placed at location K22, whose type is share pin.
+
+
+Constraints with issues:
+********************************************
+
+create_clock -name sys_clk [get_ports sys_clk] -period 37.000 -waveform {0.000 18.500}
+	C: SDC-2011: Multiple clocks is defined on one object, the clock 'clk' will be deleted.
+
+get_clocks cfg_clk
+	C: SDC-2017: Nothing implicitly matched 'cfg_clk'.
+
+get_clocks clk_25M
+	C: SDC-2017: Nothing implicitly matched 'clk_25M'.
+
+get_clocks pix_clk
+	C: SDC-2017: Nothing implicitly matched 'pix_clk'.
+
+
+Issues without commands:
+********************************************
+
+C: ConstraintEditor-2009: p:fpioa[0] is lack of PAP_IO_DRIVE, OUTPUT or INOUT PORT had better set PAP_IO_DRIVE, the optional value is {4, 8, 12, 16}.
+C: ConstraintEditor-2009: p:fpioa[0] is lack of PAP_IO_SLEW, OUTPUT or INOUT PORT had better set PAP_IO_SLEW, the optional value is {FAST, SLOW}.
+C: ConstraintEditor-2009: p:fpioa[1] is lack of PAP_IO_DRIVE, OUTPUT or INOUT PORT had better set PAP_IO_DRIVE, the optional value is {4, 8, 12, 16}.
+C: ConstraintEditor-2009: p:fpioa[1] is lack of PAP_IO_SLEW, OUTPUT or INOUT PORT had better set PAP_IO_SLEW, the optional value is {FAST, SLOW}.
+
+Unconstrained ports:
+********************************************
+
+W: ConstraintEditor-4019: Port 'JTAG_TCK' unspecified I/O constraint.
+W: ConstraintEditor-4019: Port 'JTAG_TDI' unspecified I/O constraint.
+W: ConstraintEditor-4019: Port 'JTAG_TDO' unspecified I/O constraint.
+W: ConstraintEditor-4019: Port 'JTAG_TMS' unspecified I/O constraint.
+W: ConstraintEditor-4019: Port 'ddr_init_done_led' unspecified I/O constraint.
+W: ConstraintEditor-4019: Port 'fpioa[3]' unspecified I/O constraint.
+W: ConstraintEditor-4019: Port 'fpioa[4]' unspecified I/O constraint.
+W: ConstraintEditor-4019: Port 'fpioa[5]' unspecified I/O constraint.
+W: ConstraintEditor-4019: Port 'fpioa[6]' unspecified I/O constraint.
+W: ConstraintEditor-4019: Port 'fpioa[8]' unspecified I/O constraint.
+W: ConstraintEditor-4019: Port 'fpioa[9]' unspecified I/O constraint.
+W: ConstraintEditor-4019: Port 'fpioa[10]' unspecified I/O constraint.
+W: ConstraintEditor-4019: Port 'fpioa[11]' unspecified I/O constraint.
+W: ConstraintEditor-4019: Port 'fpioa[12]' unspecified I/O constraint.
+W: ConstraintEditor-4019: Port 'fpioa[13]' unspecified I/O constraint.
+W: ConstraintEditor-4019: Port 'fpioa[17]' unspecified I/O constraint.
+W: ConstraintEditor-4019: Port 'fpioa[18]' unspecified I/O constraint.
+W: ConstraintEditor-4019: Port 'fpioa[19]' unspecified I/O constraint.
+W: ConstraintEditor-4019: Port 'fpioa[20]' unspecified I/O constraint.
+W: ConstraintEditor-4019: Port 'fpioa[21]' unspecified I/O constraint.
+W: ConstraintEditor-4019: Port 'fpioa[22]' unspecified I/O constraint.
+W: ConstraintEditor-4019: Port 'fpioa[23]' unspecified I/O constraint.
+W: ConstraintEditor-4019: Port 'fpioa[24]' unspecified I/O constraint.
+W: ConstraintEditor-4019: Port 'fpioa[25]' unspecified I/O constraint.
+W: ConstraintEditor-4019: Port 'fpioa[26]' unspecified I/O constraint.
+W: ConstraintEditor-4019: Port 'fpioa[27]' unspecified I/O constraint.
+W: ConstraintEditor-4019: Port 'fpioa[28]' unspecified I/O constraint.
+W: ConstraintEditor-4019: Port 'fpioa[29]' unspecified I/O constraint.
+W: ConstraintEditor-4019: Port 'fpioa[30]' unspecified I/O constraint.
+W: ConstraintEditor-4019: Port 'fpioa[31]' unspecified I/O constraint.
+W: ConstraintEditor-4019: Port 'frame_freeze' unspecified I/O constraint.
+W: ConstraintEditor-4019: Port 'led4' unspecified I/O constraint.
+W: ConstraintEditor-4019: Port 'led5' unspecified I/O constraint.
+W: ConstraintEditor-4019: Port 'phy_rstn' unspecified I/O constraint.
+
+Constraints with matching wildcard expressions:
+********************************************
+
+

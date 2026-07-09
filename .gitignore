@@ -1,0 +1,25 @@
+﻿# PDS build outputs
+sparrow_RISCV/synthesize/
+sparrow_RISCV/place_route/
+sparrow_RISCV/compile/
+sparrow_RISCV/device_map/
+sparrow_RISCV/generate_bitstream/
+sparrow_RISCV/logbackup/
+sparrow_RISCV/report_timing/
+sparrow_RISCV/pds.log
+sparrow_RISCV/pds.pds_lock
+
+# Generated files
+*.db
+*.adf
+*.netlist
+*.sbit
+*.smsk
+*.bak
+*.log
+*.rtr
+*.fdc.bak
+
+# IDE files
+*.fdc
+*.sof

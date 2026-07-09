@@ -1,0 +1,387 @@
+`timescale 1ns / 1ps
+`define UD #1
+
+// ====================================================================
+// HDMI 输入→DDR→HDMI 输出 + 图像预处理（车牌检测）
+// HDMI IN 部分完全参照 5_12_HDMI_IN_DDR3_HDMI_OUT 例程
+// ====================================================================
+module hdmi_ddr_ov5640_top#(
+    parameter MEM_ROW_ADDR_WIDTH   = 15         ,
+    parameter MEM_COL_ADDR_WIDTH   = 10         ,
+    parameter MEM_BADDR_WIDTH      = 3          ,
+    parameter MEM_DQ_WIDTH         =  32        ,
+    parameter MEM_DQS_WIDTH        =  32/8
+)(
+    input                                sys_clk              ,//27Mhz
+    input                                key_sel              ,
+    input                                core_clk             ,
+    input                                ddr_init_done        ,
+
+    // 帧冻结控制（来自RISC-V SoC）
+    input wire frame_freeze,
+
+    // rgmii 接口
+    input                                rgmii_clk            ,
+    output                               mac_tx_en            ,
+    output     [7:0]                     mac_tx_data          ,
+    input                                mac_rx_dv            ,
+    input      [7:0]                     mac_rx_data          ,
+
+    // ======== HDMI IN（完全匹配参考例程）========
+    input                                pixclk_in            ,
+    input                                vs_in                ,
+    input                                hs_in                ,
+    input                                de_in                ,
+    input      [7:0]                     r_in                 ,
+    input      [7:0]                     g_in                 ,
+    input      [7:0]                     b_in                 ,
+
+    // OV5640 摄像头（废弃）
+    output  [1:0]                        cmos_init_done       ,
+    inout                                cmos1_scl            ,
+    inout                                cmos1_sda            ,
+    input                                cmos1_vsync          ,
+    input                                cmos1_href           ,
+    input                                cmos1_pclk           ,
+    input   [7:0]                        cmos1_data           ,
+    output                               cmos1_reset          ,
+    inout                                cmos2_scl            ,
+    inout                                cmos2_sda            ,
+    input                                cmos2_vsync          ,
+    input                                cmos2_href           ,
+    input                                cmos2_pclk           ,
+    input   [7:0]                        cmos2_data           ,
+    output                               cmos2_reset          ,
+
+    output reg                           heart_beat_led       ,
+    output                               rstn_out             ,
+    output                               iic_tx_scl           ,
+    inout                                iic_tx_sda           ,
+    output                               hdmi_int_led         ,
+    output                               pix_clk              ,
+    output     reg                       vs_out               , 
+    output     reg                       hs_out               , 
+    output     reg                       de_out               ,
+    output     reg[7:0]                  r_out                , 
+    output     reg[7:0]                  g_out                , 
+    output     reg[7:0]                  b_out                ,
+    output                               rgmii_txc            ,
+    output                               rgmii_tx_ctl         ,
+    output      [3:0]                    rgmii_txd            ,
+
+    // M1 AXI（原图读写通道）
+    output [27:0]                        m1_awaddr     ,
+    output [3:0]                         m1_awid       ,
+    output [3:0]                         m1_awlen      ,
+    output [2:0]                         m1_awsize     ,
+    output [1:0]                         m1_awburst    ,
+    input                                m1_awready    ,
+    output                               m1_awvalid    ,
+    output [255:0]                       m1_wdata      ,
+    output [31:0]                        m1_wstrb      ,
+    input                                m1_wlast      ,
+    output                               m1_wvalid     ,
+    input                                m1_wready     ,
+    input  [3:0]                         m1_bid        ,
+    output [27:0]                        m1_araddr     ,
+    output [3:0]                         m1_arid       ,
+    output [3:0]                         m1_arlen      ,
+    output [2:0]                         m1_arsize     ,
+    output [1:0]                         m1_arburst    ,
+    output                               m1_arvalid    ,
+    input                                m1_arready    ,
+    output                               m1_rready     ,
+    input  [255:0]                       m1_rdata      ,
+    input                                m1_rvalid     ,
+    input                                m1_rlast      ,
+    input  [3:0]                         m1_rid        ,
+
+    // M2 AXI（二值图写通道 + 读通道）
+    output [27:0]                        m2_awaddr     ,
+    output [3:0]                         m2_awid       ,
+    output [3:0]                         m2_awlen      ,
+    output [2:0]                         m2_awsize     ,
+    output [1:0]                         m2_awburst    ,
+    input                                m2_awready    ,
+    output                               m2_awvalid    ,
+    output [255:0]                       m2_wdata      ,
+    output [31:0]                        m2_wstrb      ,
+    input                                m2_wlast      ,
+    output                               m2_wvalid     ,
+    input                                m2_wready     ,
+    input  [3:0]                         m2_bid        ,
+    output [27:0]                        m2_araddr     ,
+    output [3:0]                         m2_arid       ,
+    output [3:0]                         m2_arlen      ,
+    output [2:0]                         m2_arsize     ,
+    output [1:0]                         m2_arburst    ,
+    output                               m2_arvalid    ,
+    input                                m2_arready    ,
+    output                               m2_rready     ,
+    input  [255:0]                       m2_rdata      ,
+    input                                m2_rvalid     ,
+    input                                m2_rlast      ,
+    input  [3:0]                         m2_rid
+);
+
+// ==================== 参数（完全匹配参考例程）====================
+parameter CTRL_ADDR_WIDTH = MEM_ROW_ADDR_WIDTH + MEM_BADDR_WIDTH + MEM_COL_ADDR_WIDTH;
+parameter TH_1S = 27'd33000000;
+
+// ==================== 信号声明 ====================
+reg  [15:0]                 rstn_1ms            ;
+wire[15:0]                  o_rgb565            ;
+wire [15:0]                 hdmi_data_in        ;
+wire                        init_done           ;
+reg  [26:0]                 cnt                 ;
+wire                        locked              ;
+wire                        cfg_clk             ;
+wire                        init_over           ;
+wire                        rx_init_done        ;
+wire                        de_o                ;
+wire                        rd_en               ;
+wire                        vs_reg              ;
+wire                        hs_reg              ;
+
+// ==================== 摄像头信号（废弃，但端口保留）====================
+assign cmos_init_done = 2'b0;
+
+// ==================== HDMI 输入数据（完全匹配参考例程）====================
+assign hdmi_data_in = {r_in[7:3], g_in[7:2], b_in[7:3]};
+
+// ==================== PLL（匹配参考例程：27MHz→148.5MHz）====================
+pll u_pll (
+    .clkin1   (  sys_clk    ),//27MHz
+    .clkout0  (  pix_clk    ),   // 148.5MHz for 1080p
+    .clkout1  (             ),   // 未使用
+    .clkout2  (             ),   // 未使用
+    .lock     (  locked     )
+);
+
+cfg_pll cfg_pll_inst (
+    .clkout0  (  cfg_clk    ),
+    .lock     (             ),
+    .clkin1   (  sys_clk    )
+);
+
+// ==================== MS72xx HDMI I2C 配置（匹配参考例程）====================
+ms72xx_ctl ms72xx_ctl(
+    .clk            (  cfg_clk        ),
+    .rst_n          (  rstn_out       ),
+    .init_over_rx   (  rx_init_done   ),
+    .init_over      (  init_over      ),
+    .iic_scl        (  iic_tx_scl     ),
+    .iic_sda        (  iic_tx_sda     )
+);
+
+assign init_over_rx = rx_init_done;
+assign hdmi_int_led = init_over;
+
+// ==================== 复位延迟（匹配参考例程）====================
+always @(posedge cfg_clk) begin
+    if(!locked)
+        rstn_1ms <= 16'd0;
+    else begin
+        if(rstn_1ms == 16'h2710)
+            rstn_1ms <= rstn_1ms;
+        else
+            rstn_1ms <= rstn_1ms + 1'b1;
+    end
+end
+
+assign rstn_out = (rstn_1ms == 16'h2710);
+
+// ==================== fram_buf（完全匹配参考例程的实例化）====================
+// HDMI IN → DDR → HDMI OUT
+fram_buf #(
+    .ADDR_OFFSET    (32'h0100_0000) ,
+    .H_NUM          (12'd1920),     
+    .V_NUM          (12'd1080)       
+) fram_buf_raw (
+    .ddr_clk        (  core_clk             ),
+    .ddr_rstn       (  ddr_init_done        ),
+    // 写入端：HDMI IN（完全匹配参考例程）
+    .vin_clk        (  pixclk_in            ),
+    .wr_fsync       (  ~vs_in               ),  // 参考例程取反
+        .wr_en          (  de_in & (~frame_freeze)  ),  // 帧冻结控制
+    .wr_data        (  hdmi_data_in         ),
+    // 读出端
+    .vout_clk       (  pix_clk              ),
+    .rd_fsync       (  vs_reg               ),
+    .rd_en          (  rd_en                ),
+    .vout_de        (  de_o                 ),
+    .vout_data      (  o_rgb565             ),
+    .init_done      (  init_done            ),
+    // AXI 总线（M1：原图通道）
+    .axi_awaddr     (  m1_awaddr            ),
+    .axi_awid       (  m1_awid              ),
+    .axi_awlen      (  m1_awlen             ),
+    .axi_awsize     (  m1_awsize            ),
+    .axi_awburst    (  m1_awburst           ),
+    .axi_awready    (  m1_awready           ),
+    .axi_awvalid    (  m1_awvalid           ),
+    .axi_wdata      (  m1_wdata             ),
+    .axi_wstrb      (  m1_wstrb             ),
+    .axi_wlast      (  m1_wlast             ),
+    .axi_wvalid     (  m1_wvalid            ),
+    .axi_wready     (  m1_wready            ),
+    .axi_bid        (  m1_bid               ),
+    .axi_araddr     (  m1_araddr            ),
+    .axi_arid       (  m1_arid              ),
+    .axi_arlen      (  m1_arlen             ),
+    .axi_arsize     (  m1_arsize            ),
+    .axi_arburst    (  m1_arburst           ),
+    .axi_arvalid    (  m1_arvalid           ),
+    .axi_arready    (  m1_arready           ),
+    .axi_rready     (  m1_rready            ),
+    .axi_rdata      (  m1_rdata             ),
+    .axi_rvalid     (  m1_rvalid            ),
+    .axi_rlast      (  m1_rlast             ),
+    .axi_rid        (  m1_rid               )
+);
+
+// ==================== HDMI 输出（完全匹配参考例程）====================
+always @(posedge pix_clk) begin
+    vs_out <= vs_reg;
+    hs_out <= hs_reg;
+        de_out <= proc_de;                     // 使用二值化的de
+        r_out  <= {proc_rgb565_o[15:11], 3'b0};  // 显示二值化图
+        g_out  <= {proc_rgb565_o[10:5],  2'b0};  // 显示二值化图
+        b_out  <= {proc_rgb565_o[4:0],   3'b0};  // 显示二值化图
+end
+
+// ==================== sync_vg 1080p 时序（完全匹配参考例程）====================
+parameter V_TOTAL = 12'd1125;  parameter V_FP = 12'd4;    
+parameter V_BP = 12'd36;       parameter V_SYNC = 12'd5;  
+parameter V_ACT = 12'd1080;    
+parameter H_TOTAL = 12'd2200;  parameter H_FP = 12'd88;   
+parameter H_BP = 12'd148;      parameter H_SYNC = 12'd44; 
+parameter H_ACT = 12'd1920;    
+parameter HV_OFFSET = 12'd0;   
+parameter X_WIDTH = 4'd12;
+parameter Y_WIDTH = 4'd12;
+
+wire [X_WIDTH-1:0] act_x;
+wire [Y_WIDTH-1:0] act_y;
+
+sync_vg #(
+    .X_BITS   (  X_WIDTH  ), .Y_BITS   (  Y_WIDTH  ),
+    .V_TOTAL  (  V_TOTAL ), .V_FP     (  V_FP     ),
+    .V_BP     (  V_BP    ), .V_SYNC   (  V_SYNC   ),
+    .V_ACT    (  V_ACT   ), .H_TOTAL  (  H_TOTAL  ),
+    .H_FP     (  H_FP    ), .H_BP     (  H_BP     ),
+    .H_SYNC   (  H_SYNC  ), .H_ACT    (  H_ACT    )
+) sync_vg_inst (                                         
+    .clk      (  pix_clk               ),
+    .rstn     (  ddr_init_done         ),
+    .vs_out   (  vs_reg                ),
+    .hs_out   (  hs_reg                ),
+    .de_out   (  rd_en                 ),
+    .x_act    (  act_x                 ),
+    .y_act    (  act_y                 )
+);
+
+// ==================== 图像预处理（车牌检测）====================
+wire        proc_vsync, proc_hsync, proc_de;
+wire [7:0]  proc_bin;
+wire [15:0] proc_rgb565_o;
+
+image_process #(
+    .IMG_WIDTH     ( 1920 ),
+    .IMG_HEIGHT    ( 1080 )
+) u_image_process (
+    .clk           ( pix_clk                              ),
+    .rst_n         ( ddr_init_done & init_done            ),
+    .in_vsync      ( vs_reg                               ),
+    .in_hsync      ( hs_reg                               ),
+    .in_de         ( de_o                                 ),
+    .in_r          ( {o_rgb565[15:11], 3'b0}              ),
+    .in_g          ( {o_rgb565[10:5],  2'b0}              ),
+    .in_b          ( {o_rgb565[4:0],   3'b0}              ),
+    .out_vsync     ( proc_vsync                           ),
+    .out_hsync     ( proc_hsync                           ),
+    .out_de        ( proc_de                              ),
+    .out_bin       ( proc_bin                             )
+);
+
+assign proc_rgb565_o = {proc_bin[7:3], proc_bin[7:2], proc_bin[7:3]};
+
+// 二值图缓存（M2 AXI 通道）
+fram_buf #(
+    .ADDR_OFFSET    (32'h0000_0000) ,
+    .H_NUM          (12'd1920),     
+    .V_NUM          (12'd1080)       
+) fram_buf_bin (
+    .ddr_clk        (  core_clk             ),
+    .ddr_rstn       (  ddr_init_done        ),
+    .vin_clk        (  pix_clk              ),
+    .wr_fsync       (  proc_vsync           ),
+        .wr_en          (  proc_de & (~frame_freeze)  ),  // 帧冻结控制
+    .wr_data        (  proc_rgb565_o        ), 
+    .vout_clk       (  pix_clk              ),
+    .rd_fsync       (  vs_reg               ), 
+    .rd_en          (  1'b0                 ),
+    .vout_de        (                       ),
+    .vout_data      (                       ),
+    .init_done      (                       ),
+    .axi_awaddr     (  m2_awaddr            ),
+    .axi_awid       (  m2_awid              ),
+    .axi_awlen      (  m2_awlen             ),
+    .axi_awsize     (  m2_awsize            ),
+    .axi_awburst    (  m2_awburst           ),
+    .axi_awready    (  m2_awready           ),
+    .axi_awvalid    (  m2_awvalid           ),
+    .axi_wdata      (  m2_wdata             ),
+    .axi_wstrb      (  m2_wstrb             ),
+    .axi_wlast      (  m2_wlast             ),
+    .axi_wvalid     (  m2_wvalid            ),
+    .axi_wready     (  m2_wready            ),
+    .axi_bid        (  m2_bid               ),
+    .axi_araddr     (  m2_araddr            ),
+    .axi_arid       (  m2_arid              ),
+    .axi_arlen      (  m2_arlen             ),
+    .axi_arsize     (  m2_arsize            ),
+    .axi_arburst    (  m2_arburst           ),
+    .axi_arvalid    (  m2_arvalid           ),
+    .axi_arready    (  m2_arready           ),
+    .axi_rready     (  m2_rready            ),
+    .axi_rdata      (  m2_rdata             ),
+    .axi_rvalid     (  m2_rvalid            ),
+    .axi_rlast      (  m2_rlast             ),
+    .axi_rid        (  m2_rid               )
+);
+
+// ==================== 以太网视频流 ====================
+ethernet_ddr_streamer ethernet_ddr_streamer (
+    .video_clk      ( pix_clk      ),
+    .video_vsync    ( vs_reg       ),
+    .video_de       ( de_o         ),
+    .video_data     ( o_rgb565     ),
+    .rstn_in        ( rstn_out     ),
+    .rgmii_clk      ( rgmii_clk    ),
+    .mac_tx_en      ( mac_tx_en    ),
+    .mac_tx_data    ( mac_tx_data  ),
+    .mac_rx_dv      ( mac_rx_dv    ),
+    .mac_rx_data    ( mac_rx_data  ),
+    .stream_active  (              )
+);
+
+// ==================== 心跳 LED ====================
+always@(posedge core_clk) begin
+    if (!ddr_init_done)
+        cnt <= 27'd0;
+    else if ( cnt >= TH_1S )
+        cnt <= 27'd0;
+    else
+        cnt <= cnt + 27'd1;
+end
+
+always @(posedge core_clk) begin
+    if (!ddr_init_done)
+        heart_beat_led <= 1'd1;
+    else if ( cnt >= TH_1S )
+        heart_beat_led <= ~heart_beat_led;
+end
+
+endmodule
+
