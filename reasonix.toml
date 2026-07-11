@@ -1,0 +1,36 @@
+default_model = "deepseek/deepseek-v4-flash"
+[permissions]
+allow = ["Bash(cd \"D:\\PDS\\test\\Sparrow_RISC-V\\MRS\"; Get-Content \"obj\\app\\subdir.mk\" -Raw)", "Bash(cd \"D:\\PDS\\test\\5_12_HDMI_IN_DDR3_HDMI_OUT\" && pwd)", "Bash(Set-Location \"D:\\PDS\\test\\5_12_HDMI_IN_DDR3_HDMI_OUT\"; Get-Location)", "Bash($results = @()\n$tempFolders = @(\n    \"$env:TEMP\",\n    \"$env:TMP\",\n    \"C:\\Windows\\Temp\",\n    \"C:\\Windows\\Prefetch\",\n    \"C:\\Windows\\SoftwareDistribution\\Download\",\n    \"$env:LOCALAPPDATA\\Temp\",\n    \"C:\\Windows\\Logs\",\n    \"$env:LOCALAPPDATA\\Microsoft\\Windows\\INetCache\",\n    \"$env:LOCALAPPDATA\\Microsoft\\Windows\\WER\",\n    \"C:\\Windows\\System32\\LogFiles\",\n    \"C:\\Windows\\Debug\"\n)\nforeach ($folder in $tempFolders) {\n    if (Test-Path $folder) {\n        $size = (Get-ChildItem -Path $folder -Recurse -File -ErrorAction SilentlyContinue | Measure-Object -Property Length -Sum).Sum\n        if ($size -gt 0) {\n            $results += [PSCustomObject]@{\n                Folder = $folder\n                SizeMB = [math]::Round($size / 1MB, 2)\n            }\n        }\n    }\n}\n$results | Sort-Object SizeMB -Descending | Format-Table -AutoSize)", "Bash(# 查看更多可能产生垃圾的位置\n$moreFolders = @(\n    \"C:\\Windows\\Prefetch\",\n    \"C:\\Windows\\Temp\",\n    \"$env:LOCALAPPDATA\\Microsoft\\Edge\\User Data\\Default\\Cache\",\n    \"$env:LOCALAPPDATA\\Google\\Chrome\\User Data\\Default\\Cache\",\n    \"$env:LOCALAPPDATA\\Microsoft\\Windows\\INetCache\",\n    \"$env:LOCALAPPDATA\\Microsoft\\TerminalServerClient\\Cache\",\n    \"$env:LOCALAPPDATA\\Temp\\*\",\n    \"C:\\Windows\\assembly\\NativeImages_v*\",\n    \"$env:USERPROFILE\\Downloads\",\n    \"C:\\Windows.old\"\n)\nforeach ($folder in $moreFolders) {\n    if (Test-Path $folder) {\n        if ($folder -like \"*\\*\") {\n            $size = (Get-ChildItem -Path $folder -Recurse -File -ErrorAction SilentlyContinue | Measure-Object -Property Length -Sum).Sum\n        } else {\n            $size = (Get-ChildItem -Path $folder -Recurse -File -ErrorAction SilentlyContinue | Measure-Object -Property Length -Sum).Sum\n        }\n        if ($size -and $size -gt 0) {\n            Write-Host \"$folder : $([math]::Round($size/1MB, 2)) MB\"\n        } else {\n            Write-Host \"$folder : 0 MB (空或有权限问题)\"\n        }\n    } else {\n        Write-Host \"$folder : 不存在\"\n    }\n})", "Bash(# 检查回收站大小\nWrite-Host \"=== 回收站 ===\"\nGet-ChildItem -Path \"C:\\`$Recycle.Bin\" -Force -ErrorAction SilentlyContinue | ForEach-Object {\n    $size = (Get-ChildItem -Path $_.FullName -Recurse -File -ErrorAction SilentlyContinue | Measure-Object -Property Length -Sum).Sum\n    Write-Host \"$($_.Name) : $([math]::Round($size/1MB, 2)) MB\"\n})", "Bash(# 看看C盘根目录的几个大文件夹具体是什么\nWrite-Host \"=== C:\\C++ (6.97 GB) ===\"\nGet-ChildItem \"C:\\C++\" -Directory -ErrorAction SilentlyContinue | Select-Object Name\n\nWrite-Host \"\"\nWrite-Host \"=== C:\\eSupport (4.54 GB) ===\"\nGet-ChildItem \"C:\\eSupport\" -Directory -ErrorAction SilentlyContinue | Select-Object Name\n\nWrite-Host \"\"\nWrite-Host \"=== 其他C盘根目录文件夹 ===\"\nGet-ChildItem C:\\ -Directory -ErrorAction SilentlyContinue | Where-Object { $_.Name -notin @('Windows','Program Files','Program Files (x86)','Users','ProgramData','Recovery','System Volume Information','$Recycle.Bin','$WinREAgent','Documents and Settings','PerfLogs') } | Select-Object Name)", "Bash(# 深入看看几个大文件夹的内容\nWrite-Host \"=== C:\\C++ 详细 ===\"\nGet-ChildItem \"C:\\C++\" -Recurse -ErrorAction SilentlyContinue -Depth 1 | Select-Object FullName, Length | Where-Object { $_.Length -gt 0 } | Sort-Object Length -Descending | Select-Object -First 10\n\nWrite-Host \"\"\nWrite-Host \"=== C:\\eSupport 详细 ===\"\nGet-ChildItem \"C:\\eSupport\" -Recurse -ErrorAction SilentlyContinue -Depth 1 | Select-Object FullName, Length | Where-Object { $_.Length -gt 0 } | Sort-Object Length -Descending | Select-Object -First 10\n\nWrite-Host \"\"\nWrite-Host \"=== C:\\eDriver 详细 ===\"\nGet-ChildItem \"C:\\eDriver\" -Recurse -ErrorAction SilentlyContinue -Depth 1 | Select-Object FullName, Length | Where-Object { $_.Length -gt 0 } | Sort-Object Length -Descending | Select-Object -First 10)", "Bash(cd \"D:\\Esp32\\test\\esp_lcd_gc9a01\"\n# 看看主文件中 servo_sweep_task 函数和 app_main 末尾\nSelect-String -Path \"main/spi_lcd_touch_example_main.c\" -Pattern \"servo_sweep_task|g_servo_angle|servo_init|xTaskCreate\")"]
+
+
+[[providers]]
+name        = "deepseek-flash"
+kind        = "openai"
+base_url    = "https://api.deepseek.com"
+model       = "deepseek-v4-flash"
+api_key_env = "DEEPSEEK_API_KEY"
+balance_url = "https://api.deepseek.com/user/balance"
+context_window = 1000000
+price       = { cache_hit = 0.02, input = 1, output = 2, currency = "¥" }
+
+[[providers]]
+name        = "deepseek-pro"
+kind        = "openai"
+base_url    = "https://api.deepseek.com"
+model       = "deepseek-v4-pro"
+api_key_env = "DEEPSEEK_API_KEY"
+balance_url = "https://api.deepseek.com/user/balance"
+context_window = 1000000
+price       = { cache_hit = 0.025, input = 3, output = 6, currency = "¥" }
+
+[[providers]]
+name        = "deepseek"
+kind        = "openai"
+base_url    = "https://api.deepseek.com"
+models      = ["deepseek-v4-flash", "deepseek-v4-pro"]
+default     = "deepseek-v4-flash"
+api_key_env = "DEEPSEEK_API_KEY"
+balance_url = "https://api.deepseek.com/user/balance"
+context_window = 1000000
+price       = { cache_hit = 0.02, input = 1, output = 2, currency = "¥" }
+prices      = { "deepseek-v4-flash" = { cache_hit = 0.02, input = 1, output = 2, currency = "¥" }, "deepseek-v4-pro" = { cache_hit = 0.025, input = 3, output = 6, currency = "¥" } }
