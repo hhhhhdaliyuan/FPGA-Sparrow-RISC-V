@@ -206,7 +206,7 @@ fram_buf #(
     // 写入端：HDMI IN（完全匹配参考例程）
     .vin_clk        (  pixclk_in            ),
     .wr_fsync       (  ~vs_in               ),  // 参考例程取反
-        .wr_en          (  de_in & ~frame_freeze  ),  // 帧冻结控制
+        .wr_en          (  de_in   ),  // 帧冻结控制
     .wr_data        (  hdmi_data_in         ),
     // 读出端
     .vout_clk       (  pix_clk              ),
@@ -337,7 +337,7 @@ fram_buf #(
     .ddr_rstn       (  ddr_init_done        ),
     .vin_clk        (  pix_clk              ),
     .wr_fsync       (  pad_vsync            ),
-        .wr_en      (  pad_de & ~frame_freeze  ),    
+        .wr_en      (  pad_de               ),  
     .wr_data        (  pad_rgb565_o         ), 
     .vout_clk       (  pix_clk              ),
     .rd_fsync       (  vs_reg               ), 

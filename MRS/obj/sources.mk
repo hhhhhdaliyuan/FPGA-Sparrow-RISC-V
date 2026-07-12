@@ -31,3 +31,4 @@ app \
 lib/driver/src \
 lib/perip/src \
 lib/startup \
+main.c±¸·Ý \

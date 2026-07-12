@@ -1,0 +1,93 @@
+﻿// 形态学闭运算（位图并行加速）
+// 输入: MEM_BW_IMG 每像素8bit (0/255)
+// 输出: 同一区域, 闭运算后结果
+void morph_close_bitmap(int w, int h) {
+    volatile uint32_t* bw = MEM_BW_IMG;
+    int wpl = w >> 2;                 // 440/4 = 110 (32位字, 每字4个8bit像素)
+    int bm_words = (w + 31) >> 5;     // 440/32 = 14 (位图每行14个uint32_t)
+    int bm_size = bm_words * h;       // 位图总字数
+    
+    // ---- DDR临时缓冲区(放位图) ----
+    volatile uint32_t* bm = (volatile uint32_t*)0xA1B00000;  // 位图
+    volatile uint32_t* tmp = (volatile uint32_t*)0xA1B01000; // 临时
+    
+    // Step 1: 8bit/pixel → 1bit/pixel 位图 (每字32像素)
+    for (int y = 0; y < h; y++) {
+        for (int x = 0; x < w; x += 32) {
+            uint32_t bits = 0;
+            for (int k = 0; k < 32 && (x + k) < w; k++) {
+                int byte_idx = (y * wpl) + ((x + k) >> 2);
+                int bit_pos = ((x + k) & 3) * 8;
+                if ((bw[byte_idx] >> bit_pos) & 0xFF) bits |= (1 << k);
+            }
+            bm[y * bm_words + (x >> 5)] = bits;
+        }
+    }
+    
+    // Step 2: 水平膨胀 (核宽3)
+    for (int y = 0; y < h; y++) {
+        int row = y * bm_words;
+        for (int wd = 0; wd < bm_words; wd++) {
+            uint32_t cur = bm[row + wd];
+            uint32_t left = bm[row + (wd > 0 ? wd - 1 : 0)];     // 前一字
+            uint32_t right = bm[row + (wd < bm_words-1 ? wd+1 : bm_words-1)]; // 后一字
+            uint32_t dilated = cur;
+            // 左邻居(当前字右移1 + 前一字最高位)
+            if (wd > 0) dilated |= (cur >> 1) | (left << 31);
+            else dilated |= cur >> 1;
+            // 右邻居(当前字左移1 + 后一字最低位)
+            if (wd < bm_words - 1) dilated |= (cur << 1) | (right >> 31);
+            else dilated |= cur << 1;
+            tmp[row + wd] = dilated;
+        }
+    }
+    
+    // Step 3: 垂直膨胀 (核高3)
+    for (int y = 0; y < h; y++) {
+        int row = y * bm_words;
+        int row_up = (y > 0) ? (y - 1) * bm_words : row;
+        int row_dn = (y < h - 1) ? (y + 1) * bm_words : row;
+        for (int wd = 0; wd < bm_words; wd++) {
+            tmp[row + wd] |= tmp[row_up + wd] | tmp[row_dn + wd];
+        }
+    }
+    
+    // Step 4: 水平腐蚀 (核宽3)
+    for (int y = 0; y < h; y++) {
+        int row = y * bm_words;
+        for (int wd = 0; wd < bm_words; wd++) {
+            uint32_t cur = tmp[row + wd];
+            uint32_t left = tmp[row + (wd > 0 ? wd - 1 : 0)];
+            uint32_t right = tmp[row + (wd < bm_words-1 ? wd+1 : bm_words-1)];
+            uint32_t eroded = cur;
+            if (wd > 0) eroded &= (cur >> 1) | (left << 31);
+            else eroded &= cur >> 1;
+            if (wd < bm_words - 1) eroded &= (cur << 1) | (right >> 31);
+            else eroded &= cur << 1;
+            bm[row + wd] = eroded;
+        }
+    }
+    
+    // Step 5: 垂直腐蚀 (核高3)
+    for (int y = 0; y < h; y++) {
+        int row = y * bm_words;
+        int row_up = (y > 0) ? (y - 1) * bm_words : row;
+        int row_dn = (y < h - 1) ? (y + 1) * bm_words : row;
+        for (int wd = 0; wd < bm_words; wd++) {
+            bm[row + wd] &= bm[row_up + wd] & bm[row_dn + wd];
+        }
+    }
+    
+    // Step 6: 位图 → 8bit/pixel 写回原缓冲区
+    for (int y = 0; y < h; y++) {
+        for (int x = 0; x < w; x += 32) {
+            uint32_t bits = bm[y * bm_words + (x >> 5)];
+            for (int k = 0; k < 32 && (x + k) < w; k++) {
+                int byte_idx = (y * wpl) + ((x + k) >> 2);
+                int bit_pos = ((x + k) & 3) * 8;
+                uint8_t val = (bits & (1 << k)) ? 255 : 0;
+                bw[byte_idx] = (bw[byte_idx] & ~(0xFF << bit_pos)) | (val << bit_pos);
+            }
+        }
+    }
+}

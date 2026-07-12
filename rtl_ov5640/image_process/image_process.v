@@ -1,6 +1,6 @@
 module image_process #(
-	parameter IMG_WIDTH  = 1920,
-	parameter IMG_HEIGHT = 1080,
+	parameter IMG_WIDTH  = 1280,
+	parameter IMG_HEIGHT = 720,
 	parameter EDGE_THR   = 48,
 	parameter H_BLUE_MIN = 140,
 	parameter H_BLUE_MAX = 191,
@@ -125,6 +125,7 @@ module image_process #(
 		wire        hsv_align_de;
 		wire        hsv_align_bin;
 		wire        final_fused_bin;
+
 		wire        final_pack_vsync;
 		wire        final_pack_hsync;
 		wire        final_pack_de;
@@ -262,7 +263,7 @@ module image_process #(
 			color_de_d1 <= color_de_d0;
 			color_de_d2 <= color_de_d1;
 
-			color_bin_d0 <= in_de & (color_mask_blue | color_mask_green | color_mask_yellow | (color_s < 8'd30 & color_v > 8'd180));  // +白色亮度检测(覆盖绿牌渐变)
+			color_bin_d0 <= in_de & (color_mask_blue | color_mask_green | color_mask_yellow | (color_s < 8'd30 & color_v > 8'd180));  // +白色检测
 			color_bin_d1 <= color_bin_d0;
 			color_bin_d2 <= color_bin_d1;
 		end
@@ -270,8 +271,8 @@ module image_process #(
 
 // morphological closing --- sobel
 	morph_close_25x3 #(
-		.IMG_WIDTH(IMG_WIDTH)
-	) u_sobel_close_25x3 (
+    .IMG_WIDTH(IMG_WIDTH)
+) u_sobel_close_25x3 (
 		.clk      (clk),
 		.rst_n    (rst_n),
 		.in_vsync (sobel_vsync),
@@ -435,7 +436,7 @@ module image_process #(
 
 	assign hsv_align_de   = hsv_align_sel[1];
 	assign hsv_align_bin  = hsv_align_sel[0];
-	assign final_fused_bin = hsv_align_bin & hsv_align_de;  // 【修改】去掉Sobel AND，直接用HSV色彩掩码
+	assign final_fused_bin = sobel_close_bin & hsv_align_bin & hsv_align_de;
 
 // hsv out
 	binary_frame_out u_hsv_binary_frame_out (
@@ -451,6 +452,7 @@ module image_process #(
 		.out_de   (hsv_pack_de),
 		.out_pix  (hsv_pack_pix)
 	);
+
 
 	binary_frame_out u_final_binary_frame_out (
 		.clk      (clk),
@@ -472,4 +474,3 @@ module image_process #(
 	assign out_bin   = final_pack_pix;
 
 endmodule
-

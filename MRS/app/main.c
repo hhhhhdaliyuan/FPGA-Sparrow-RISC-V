@@ -1,226 +1,194 @@
-﻿#include <stdint.h>
-#include <string.h>
+#include <stdint.h>
 #include "core.h"
 #include "system.h"
 #include "uart.h"
 #include "printf.h"
 
-#define DDR_RAW_FRAME           0xA4000000  // 原图
-#define RAW_W                   1920
-#define IMG_H                   1080
-#define DDR_STRIDE32            960         // 1920/2
+#define FRAME_FREEZE_ADDR 0x40000400
+#define DDR_BIN_FRAME     0xA0000000
+#define DDR_RAW_FRAME     0xA4000000
+#define DDR_STRIDE32      960
+#define IMG_W             1920
+#define IMG_H             1080
+#define SCAN_Y0           100
+#define SCAN_Y1           (IMG_H-31)
+#define MIN_AREA          500
+#define MIN_W             60
+#define MIN_H             10
+#define MIN_RATIO         2
+#define MAX_RATIO         6
+#define PIPE_DX           27
+#define PIPE_DY           5
+#define EDGE_M            3
 
-#define TARGET_W                440
-#define TARGET_H                140
-#define FIXED_SHIFT             8
-#define FIXED_SCALE             (1 << FIXED_SHIFT)
+// DDR 投影数组
+#define DDR_RSUM  ((volatile int*)0xA0800000)
+#define DDR_CSUM  ((volatile int*)0xA0880000)
 
-// DDR内存映射
-#define MEM_DST                 ((volatile uint16_t*)0xA1900000)  // 校正后原图
-#define MEM_BW                  ((volatile uint32_t*)0xA1A00000)  // 二值图
-#define MEM_PROJ_H              ((volatile uint16_t*)0xA1C00000)  // 水平投影
-#define MEM_PROJ_V              ((volatile uint16_t*)0xA1C01000)  // 垂直投影
-#define MAP_TABLE               ((volatile int*)0xA2000000)       // 映射表
-#define MAP_XY(y,x)             MAP_TABLE[((y)*TARGET_W+(x))*2]
-#define MAP_YY(y,x)             MAP_TABLE[((y)*TARGET_W+(x))*2+1]
+static int g_box_x0,g_box_y0,g_box_x1,g_box_y1,g_box_area;
+static int g_tlx,g_tly,g_trx,g_try,g_blx,g_bly,g_brx,g_bry;
+static uint32_t lb_buf[960];
 
-int max(int a,int b){return a>b?a:b;}
-int min(int a,int b){return a<b?a:b;}
 void delay(uint32_t c){for(volatile uint32_t i=0;i<c;i++);}
-
-int div_int(int n,int d){
-    if(d==0)return 0;int r=0;
-    while(n>=d){int t=d,m=1;while(n>=(t<<1)&&(t<<1)>t){t<<=1;m<<=1;}n-=t;r+=m;}
-    return r;
-}
-
-void uart_byte(uint8_t c){uart_send_date(UART0,c);for(volatile int n=0;n<15;n++);}
+static inline void freeze(void){*(volatile uint32_t*)FRAME_FREEZE_ADDR=1;}
+static inline void unfreeze(void){*(volatile uint32_t*)FRAME_FREEZE_ADDR=0;}
+void uart_byte(uint8_t c){uart_send_date(UART0,c);for(volatile int n=0;n<200;n++);}
 void uart16(uint16_t v){uart_byte((v>>8)&0xFF);uart_byte(v&0xFF);}
 
-// 32位读原图像素
-uint16_t get_px(int sx,int sy){
-    if(sx<0||sx>=RAW_W||sy<0||sy>=IMG_H)return 0;
-    volatile uint32_t* r32=(volatile uint32_t*)DDR_RAW_FRAME;
-    uint32_t w=r32[sy*DDR_STRIDE32+(sx>>1)];
-    return (w>>((sx&1)?16:0))&0xFFFF;
+static inline int is_white(volatile uint32_t* base,int x,int y){
+    uint32_t wd=base[y*DDR_STRIDE32+(x>>1)];
+    uint16_t px=(uint16_t)((x&1)?(wd>>16):(wd&0xFFFF));
+    return(px>0x8000);
 }
 
-// ===== 生成透视映射表 =====
-void init_map(int tl_x,int tl_y,int tr_x,int tr_y,int bl_x,int bl_y,int br_x,int br_y){
-    printf("[0] 透视映射表...\r\n");
-    for(int y=0;y<TARGET_H;y++){
-        int fy=div_int(y*FIXED_SCALE,TARGET_H-1),iv_fy=FIXED_SCALE-fy;
-        for(int x=0;x<TARGET_W;x++){
-            int fx=div_int(x*FIXED_SCALE,TARGET_W-1),iv_fx=FIXED_SCALE-fx;
-            MAP_XY(y,x)=((iv_fx*iv_fy>>FIXED_SHIFT)*tl_x+(fx*iv_fy>>FIXED_SHIFT)*tr_x+
-                         (fx*fy>>FIXED_SHIFT)*br_x+(iv_fx*fy>>FIXED_SHIFT)*bl_x)>>FIXED_SHIFT;
-            MAP_YY(y,x)=((iv_fx*iv_fy>>FIXED_SHIFT)*tl_y+(fx*iv_fy>>FIXED_SHIFT)*tr_y+
-                         (fx*fy>>FIXED_SHIFT)*br_y+(iv_fx*fy>>FIXED_SHIFT)*bl_y)>>FIXED_SHIFT;
+void find_plate(void){
+    printf("[1]scan\r\n");
+    volatile uint32_t* bin=(volatile uint32_t*)DDR_BIN_FRAME;
+    volatile int* rsum=DDR_RSUM;
+    volatile int* csum=DDR_CSUM;
+    for(int i=SCAN_Y0;i<=SCAN_Y1;i++)rsum[i]=0;
+    for(int i=0;i<IMG_W;i++)csum[i]=0;
+
+    // 极值角点跟踪
+    int tlx=IMG_W,tly=IMG_H,trx=0,try_=0,blx=IMG_W,bly=0,brx=0,bry=IMG_H;
+
+    for(int y=SCAN_Y0;y<=SCAN_Y1;y++){
+        for(int x=0;x<IMG_W;x++){
+            if(!is_white(bin,x,y))continue;
+            rsum[y]++;csum[x]++;
+            if(x+y<tlx+tly){tlx=x;tly=y;}
+            if(x-y>trx-try_){trx=x;try_=y;}
+            if(y-x>bly-blx){blx=x;bly=y;}
+            if(x+y>brx+bry){brx=x;bry=y;}
         }
     }
-    printf("  完成\r\n");
-}
 
-// ===== 1. 透视校正 =====
-void perspective_correct(){
-    printf("[1/5] 透视校正 %dx%d...\r\n",TARGET_W,TARGET_H);
-    volatile uint16_t* dst=MEM_DST;
-    for(int y=0;y<TARGET_H;y++){
-        for(int x=0;x<TARGET_W;x+=4){
-            dst[y*TARGET_W+x+0]=get_px(MAP_XY(y,x+0),MAP_YY(y,x+0));
-            dst[y*TARGET_W+x+1]=get_px(MAP_XY(y,x+1),MAP_YY(y,x+1));
-            dst[y*TARGET_W+x+2]=get_px(MAP_XY(y,x+2),MAP_YY(y,x+2));
-            dst[y*TARGET_W+x+3]=get_px(MAP_XY(y,x+3),MAP_YY(y,x+3));
+    printf("[2]proj\r\n");
+    // 行列投影找边界
+    int row_max=0;
+    for(int ry=SCAN_Y0;ry<=SCAN_Y1;ry++){if(rsum[ry]>row_max)row_max=rsum[ry];}
+    if(row_max<10){printf("无有效白像素\r\n");return;}
+    int thr=row_max/3;
+    int row_top=SCAN_Y0,row_bot=SCAN_Y1;
+    for(int ry=SCAN_Y0;ry<=SCAN_Y1;ry++){if(rsum[ry]>thr){row_top=ry;break;}}
+    for(int ry=SCAN_Y1;ry>=SCAN_Y0;ry--){if(rsum[ry]>thr){row_bot=ry;break;}}
+
+    int col_max=0;
+    for(int cx=0;cx<IMG_W;cx++){if(csum[cx]>col_max)col_max=csum[cx];}
+    thr=col_max/3;
+    int col_left=0,col_right=IMG_W-1;
+    for(int cx=0;cx<IMG_W;cx++){if(csum[cx]>thr){col_left=cx;break;}}
+    for(int cx=IMG_W-1;cx>=0;cx--){if(csum[cx]>thr){col_right=cx;break;}}
+
+    int bw=col_right-col_left+1,bh=row_bot-row_top+1;
+    int area_est=bw*bh;
+    int w2=bw*bw,h2=bh*bh;
+    if(area_est<MIN_AREA||bw<MIN_W||bh<MIN_H||w2<h2*4||w2>h2*36){
+        printf("比例不符: %dx%d area=%d\r\n",bw,bh,area_est);
+        return;
+    }
+
+    // 极值角点：从投影边界向内对角线走到白像素
+    // 左上
+    for(int d=0;d<bw+bh;d++){
+        int found=0;
+        for(int dx=0;dx<=d&&!found;dx++){
+            int dy=d-dx;
+            int nx=col_left+dx,ny=row_top+dy;
+            if(nx<=col_right&&ny<=row_bot&&is_white(bin,nx,ny))
+                {tlx=nx;tly=ny;found=1;}
         }
-        if((y&31)==0)for(volatile int n=0;n<10;n++);
+        if(found)break;
     }
-    printf("  完成\r\n");
+    // 右上
+    for(int d=0;d<bw+bh;d++){
+        int found=0;
+        for(int dx=0;dx<=d&&!found;dx++){
+            int dy=d-dx;
+            int nx=col_right-dx,ny=row_top+dy;
+            if(nx>=col_left&&ny<=row_bot&&is_white(bin,nx,ny))
+                {trx=nx;try_=ny;found=1;}
+        }
+        if(found)break;
+    }
+    // 左下
+    for(int d=0;d<bw+bh;d++){
+        int found=0;
+        for(int dx=0;dx<=d&&!found;dx++){
+            int dy=d-dx;
+            int nx=col_left+dx,ny=row_bot-dy;
+            if(nx<=col_right&&ny>=row_top&&is_white(bin,nx,ny))
+                {blx=nx;bly=ny;found=1;}
+        }
+        if(found)break;
+    }
+    // 右下
+    for(int d=0;d<bw+bh;d++){
+        int found=0;
+        for(int dx=0;dx<=d&&!found;dx++){
+            int dy=d-dx;
+            int nx=col_right-dx,ny=row_bot-dy;
+            if(nx>=col_left&&ny>=row_top&&is_white(bin,nx,ny))
+                {brx=nx;bry=ny;found=1;}
+        }
+        if(found)break;
+    }
+
+    printf("[3]out\r\n");
+    g_box_x0=col_left;g_box_y0=row_top;
+    g_box_x1=col_right;g_box_y1=row_bot;
+    g_box_area=area_est;
+    g_tlx=tlx;g_tly=tly;g_trx=trx;g_try=try_;
+    g_blx=blx;g_bly=bly;g_brx=brx;g_bry=bry;
+
+    printf("\r\n===== 投影法 =====\r\n");
+    printf("区域=%dx%d 峰值R=%d C=%d\r\n",bw,bh,row_max,col_max);
+    printf("1.投影轴对齐:\r\n");
+    printf("  左上(%d,%d) 右上(%d,%d)\r\n",col_left,row_top,col_right,row_top);
+    printf("  左下(%d,%d) 右下(%d,%d)\r\n",col_left,row_bot,col_right,row_bot);
+    printf("2.逼真+补偿:\r\n");
+    printf("  左上(%d,%d) 右上(%d,%d)\r\n",tlx+PIPE_DX,tly+PIPE_DY,trx+PIPE_DX,try_+PIPE_DY);
+    printf("  左下(%d,%d) 右下(%d,%d)\r\n",blx+PIPE_DX,bly+PIPE_DY,brx+PIPE_DX,bry+PIPE_DY);
+    printf("===== END =====\r\n\n");
 }
 
-// ===== 2. 蓝牌二值化 =====
-void binarize_plate(){
-    printf("[2/5] 蓝牌二值化...\r\n");
-    volatile uint16_t* dst=MEM_DST;
-    volatile uint32_t* bw=MEM_BW;
-    int wpl=TARGET_W>>2,white=0;
-    for(int y=0;y<TARGET_H;y++){
-        for(int x=0;x<TARGET_W;x+=4){
-            uint32_t word=0;
-            for(int k=0;k<4;k++){
-                uint16_t px=dst[y*TARGET_W+x+k];
-                int r=(px>>11)&0x1F;r=(r<<3)|(r>>2);
-                if(r>120){word|=(255<<(k*8));white++;}
-            }
-            bw[y*wpl+(x>>2)]=word;
+void send_raw_blob(void){
+    if(g_box_area<MIN_AREA)return;
+    volatile uint32_t*raw=(volatile uint32_t*)DDR_RAW_FRAME;
+    int rx0=g_box_x0+PIPE_DX,ry0=g_box_y0+PIPE_DY,rx1=g_box_x1+PIPE_DX,ry1=g_box_y1+PIPE_DY;
+    int x0=rx0-EDGE_M;if(x0<0)x0=0;
+    int y0=ry0-EDGE_M;if(y0<0)y0=0;
+    int x1=rx1+EDGE_M;if(x1>=IMG_W)x1=IMG_W-1;
+    int y1=ry1+EDGE_M;if(y1>=IMG_H)y1=IMG_H-1;
+    int w=x1-x0+1,h=y1-y0+1;
+    printf("TX raw (%d,%d)-(%d,%d) %dx%d\r\n",x0,y0,x1,y1,w,h);
+    uart_byte(0xAA);uart_byte(0x55);uart_byte(8);uart16((uint16_t)w);uart16((uint16_t)h);
+    uint32_t*lb=lb_buf;
+    for(int y=y0;y<=y1;y++){
+        int base=y*DDR_STRIDE32;
+        for(int i=0;i<960;i++)lb[i]=raw[base+i];
+        for(int x=x0;x<=x1;x++){
+            uint32_t wd=lb[x>>1];
+            uint16_t px=(uint16_t)((x&1)?(wd>>16):(wd&0xFFFF));
+            uart16(px);
         }
     }
-    printf("  白字:%d/%d\r\n",white,TARGET_W*TARGET_H);
-}
-
-// ===== 3. 字符分割 =====
-int segment_chars(int* xs,int* xe,int* pyt,int* pyb){
-    printf("[3/5] 字符分割...\r\n");
-    volatile uint32_t* bw=MEM_BW;
-    volatile uint16_t* ph=MEM_PROJ_H;
-    volatile uint16_t* pv=MEM_PROJ_V;
-    int wpl=TARGET_W>>2,mh=0;
-
-    for(int y=0;y<TARGET_H;y++){int c=0;
-        for(int w=0;w<wpl;w++){uint32_t v=bw[y*wpl+w];
-            for(int k=0;k<4;k++)if((v>>(k*8))&0xFF)c++;}
-        ph[y]=c;if(c>mh)mh=c;
-    }
-    int ht=(mh*153)>>10;if(ht<2)ht=2;
-
-    int yt=-1,yb=-1,cs=-1,ml=0;
-    for(int y=0;y<TARGET_H;y++){
-        if(ph[y]>ht){if(cs<0)cs=y;}
-        else if(cs>=0){int l=y-cs;if(l>ml){ml=l;yt=cs;yb=y-1;}cs=-1;}
-    }
-    if(cs>=0){int l=TARGET_H-cs;if(l>ml){ml=l;yt=cs;yb=TARGET_H-1;}}
-    *pyt=yt;*pyb=yb;
-    if(yt<0||yb-yt<5){printf("  未找到字符行\r\n");return 0;}
-
-    int mv=0;
-    for(int x=0;x<TARGET_W;x++){int c=0;
-        for(int y=yt;y<=yb;y++){uint32_t v=bw[y*wpl+(x>>2)];
-            if((v>>((x&3)*8))&0xFF)c++;}
-        pv[x]=c;if(c>mv)mv=c;
-    }
-    int vt=(mv*102)>>10;if(vt<1)vt=1;
-
-    int cc=0,in=0;
-    for(int x=0;x<TARGET_W;x++){
-        if(pv[x]>=vt){if(!in){xs[cc]=x;in=1;}}
-        else if(in){xe[cc]=x-1;if(xe[cc]-xs[cc]+1>=4)cc++;in=0;}
-    }
-    if(in&&(TARGET_W-1-xs[cc]+1>=4)){xe[cc]=TARGET_W-1;cc++;}
-    printf("  字符:%d个\r\n",cc);
-    for(int i=0;i<cc;i++)printf("    [%d]x=%d~%d w=%d\r\n",i+1,xs[i],xe[i],xe[i]-xs[i]+1);
-    return cc;
-}
-
-// ===== 4. 串口发送图像 =====
-void send_type_header(uint8_t type,int w,int h){
-    uart_byte(0xAA);uart_byte(0x55);uart_byte(type);
-    uart16(w);uart16(h);
-}
-
-// 发送校正后原图(440x140 RGB565)
-void send_raw_corrected(){
-    printf("  发送校正原图(%dx%d)...\r\n",TARGET_W,TARGET_H);
-    send_type_header(1,TARGET_W,TARGET_H);
-    volatile uint16_t* dst=MEM_DST;
-    for(int y=0;y<TARGET_H;y++)
-        for(int x=0;x<TARGET_W;x++){
-            uint16_t px=dst[y*TARGET_W+x];
-            uart_byte((px>>8)&0xFF);uart_byte(px&0xFF);
-        }
     uart_byte(0x55);uart_byte(0xAA);
+    printf(" raw ok\r\n");
 }
 
-// 发送二值图(440x140, 每像素8bit)
-void send_binary(){
-    printf("  发送二值图(%dx%d)...\r\n",TARGET_W,TARGET_H);
-    send_type_header(2,TARGET_W,TARGET_H);
-    volatile uint32_t* bw=MEM_BW;
-    int wpl=TARGET_W>>2;
-    for(int y=0;y<TARGET_H;y++)
-        for(int x=0;x<TARGET_W;x+=4){
-            uint32_t v=bw[y*wpl+(x>>2)];
-            uart_byte((v>>0)&0xFF);
-            uart_byte((v>>8)&0xFF);
-            uart_byte((v>>16)&0xFF);
-            uart_byte((v>>24)&0xFF);
-        }
-    uart_byte(0x55);uart_byte(0xAA);
-}
-
-// 发送每个字符
-void send_chars(int* xs,int* xe,int cc,int yt,int yb){
-    printf("  发送%d个字符...\r\n",cc);
-    volatile uint32_t* bw=MEM_BW;
-    int wpl=TARGET_W>>2,ch=yb-yt+1;
-    for(int i=0;i<cc;i++){
-        int cw=xe[i]-xs[i]+1;
-        printf("    字符%d: %dx%d\r\n",i+1,cw,ch);
-        send_type_header(3,cw,ch);
-        uart_byte(i+1);
-        for(int y=yt;y<=yb;y++)
-            for(int x=xs[i];x<=xe[i];x+=4){
-                uint32_t v=bw[y*wpl+(x>>2)];
-                for(int k=0;k<4&&(x+k)<=xe[i];k++)uart_byte((v>>(k*8))&0xFF);
-            }
-        uart_byte(0x55);uart_byte(0xAA);
-        for(volatile int n=0;n<2000;n++);
-    }
-}
-
-// ===== 主流程 =====
-int main(){
+int main(void){
     init_uart0_printf(115200,0);
-    printf("\r\n===== 车牌识别(图像发送) =====\r\n");
-
-    // 四个角坐标（可修改）
-    int tl_x=740,tl_y=477,tr_x=1180,tr_y=476;
-    int bl_x=742,bl_y=607,br_x=1185,br_y=607;
-
-    init_map(tl_x,tl_y,tr_x,tr_y,bl_x,bl_y,br_x,br_y);
-    delay(30000000);
-
-    int frame=0;
+    unfreeze();delay(500000);
+    freeze();delay(500000);
+    unfreeze();delay(2000000);
+    int loop=0;
     while(1){
-        printf("\r\n--- 第%d帧 ---\r\n",++frame);
-        perspective_correct();
-        binarize_plate();
-        int xs[20],xe[20],yt,yb;
-        int cc=segment_chars(xs,xe,&yt,&yb);
-        send_raw_corrected();
-        for(volatile int n=0;n<5000;n++);
-        send_binary();
-        for(volatile int n=0;n<5000;n++);
-        if(cc>0)send_chars(xs,xe,cc,yt,yb);
-        printf("[5/5] 完成!\r\n");
-        delay(50000000);  // 等下一帧
+        printf("--- loop %d ---\r\n",++loop);
+        freeze();delay(50);
+        find_plate();
+        //send_raw_blob();
+        unfreeze();
+        delay(3000000);
     }
 }
