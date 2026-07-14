@@ -1,16 +1,16 @@
 module image_process #(
 	parameter IMG_WIDTH  = 1280,
 	parameter IMG_HEIGHT = 720,
-	parameter EDGE_THR   = 48,
+	parameter EDGE_THR   = 80,
 	parameter H_BLUE_MIN = 140,
 	parameter H_BLUE_MAX = 191,
-	parameter H_GREEN_MIN = 38,
-	parameter H_GREEN_MAX = 128,
+	parameter H_GREEN_MIN = 40,
+	parameter H_GREEN_MAX = 110,
     // ����������ֵ����
 	parameter H_YELLOW_MIN = 25,
 	parameter H_YELLOW_MAX = 55,
-	parameter S_MIN      = 77,
-	parameter V_MIN      = 51,
+	parameter S_MIN      = 80,
+	parameter V_MIN      = 60,
 	parameter HSV_CLOSE_ALIGN_LINES = 6
 ) (
 	input  wire        clk,
@@ -263,7 +263,7 @@ module image_process #(
 			color_de_d1 <= color_de_d0;
 			color_de_d2 <= color_de_d1;
 
-			color_bin_d0 <= in_de & (color_mask_blue | color_mask_green | color_mask_yellow | (color_s < 8'd30 & color_v > 8'd180));  // +白色检测
+			color_bin_d0 <= in_de & (color_mask_blue | color_mask_green);  // 仅蓝牌+绿牌
 			color_bin_d1 <= color_bin_d0;
 			color_bin_d2 <= color_bin_d1;
 		end

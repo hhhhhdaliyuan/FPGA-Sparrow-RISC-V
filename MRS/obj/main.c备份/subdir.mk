@@ -6,16 +6,19 @@
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS += \
 ../main.c备份/BFS+投影法.c \
+../main.c备份/BFS环形队列完整代码.c \
 ../main.c备份/发送原图和二值化图.c \
 ../main.c备份/角度矫正+二值化处理+字符分割.c 
 
 C_DEPS += \
 ./main.c备份/BFS+投影法.d \
+./main.c备份/BFS环形队列完整代码.d \
 ./main.c备份/发送原图和二值化图.d \
 ./main.c备份/角度矫正+二值化处理+字符分割.d 
 
 OBJS += \
 ./main.c备份/BFS+投影法.o \
+./main.c备份/BFS环形队列完整代码.o \
 ./main.c备份/发送原图和二值化图.o \
 ./main.c备份/角度矫正+二值化处理+字符分割.o 
 

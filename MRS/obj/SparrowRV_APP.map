@@ -299,11 +299,38 @@ Discarded input sections
  .text.uart_byte
                 0x0000000000000000       0x4c ./app/main.o
  .text.uart16   0x0000000000000000       0x90 ./app/main.o
- .rodata.send_raw_blob.str1.4
-                0x0000000000000000       0x2a ./app/main.o
- .text.send_raw_blob
-                0x0000000000000000      0x41c ./app/main.o
- .bss.lb_buf    0x0000000000000000      0xf00 ./app/main.o
+ .text.div_int  0x0000000000000000       0x70 ./app/main.o
+ .text.get_px   0x0000000000000000       0x5c ./app/main.o
+ .rodata.find_plate_bfs.str1.4
+                0x0000000000000000       0x3f ./app/main.o
+ .text.find_plate_bfs
+                0x0000000000000000      0xf50 ./app/main.o
+ .text.gray_of  0x0000000000000000       0x64 ./app/main.o
+ .text.detect_type
+                0x0000000000000000       0xa4 ./app/main.o
+ .rodata.init_map.str1.4
+                0x0000000000000000        0xc ./app/main.o
+ .text.init_map
+                0x0000000000000000      0x250 ./app/main.o
+ .rodata.warp.str1.4
+                0x0000000000000000        0x5 ./app/main.o
+ .text.warp     0x0000000000000000      0x1c0 ./app/main.o
+ .rodata.binarize.str1.4
+                0x0000000000000000        0x7 ./app/main.o
+ .text.binarize
+                0x0000000000000000      0x3d0 ./app/main.o
+ .rodata.seg_chars.str1.4
+                0x0000000000000000       0x21 ./app/main.o
+ .text.seg_chars
+                0x0000000000000000      0x3a0 ./app/main.o
+ .rodata.send_bin.str1.4
+                0x0000000000000000        0xa ./app/main.o
+ .text.send_bin
+                0x0000000000000000      0x358 ./app/main.o
+ .rodata.send_chars.str1.4
+                0x0000000000000000       0x13 ./app/main.o
+ .text.send_chars
+                0x0000000000000000      0x39c ./app/main.o
  .text          0x0000000000000000        0x0 ./app/trap_handler.o
  .data          0x0000000000000000        0x0 ./app/trap_handler.o
  .bss           0x0000000000000000        0x0 ./app/trap_handler.o
@@ -373,107 +400,104 @@ END GROUP
                 0x0000000000000000                _start
                 0x0000000000000070                trap_vector_tab
 
-.text           0x00000000000000b0     0x2b1c
+.text           0x00000000000000b0     0x23bc
  *(.text.unlikely .text.unlikely.*)
  *(.text.startup .text.startup.*)
  .text.startup.main
-                0x00000000000000b0      0x140 ./app/main.o
+                0x00000000000000b0       0x80 ./app/main.o
                 0x00000000000000b0                main
  *(.text .text.*)
  .text.sparrowrv_system_init
-                0x00000000000001f0       0x68 ./lib/startup/init.o
-                0x00000000000001f0                sparrowrv_system_init
- .text          0x0000000000000258       0x38 ./lib/startup/startup.o
-                0x000000000000025c                SW_Handler
-                0x0000000000000264                PLIC0_Handler
+                0x0000000000000130       0x68 ./lib/startup/init.o
+                0x0000000000000130                sparrowrv_system_init
+ .text          0x0000000000000198       0x38 ./lib/startup/startup.o
+                0x000000000000019c                SW_Handler
+                0x00000000000001a4                PLIC0_Handler
  .text.csr_msprint_string
-                0x0000000000000290       0x18 ./lib/perip/src/core.o
-                0x0000000000000290                csr_msprint_string
+                0x00000000000001d0       0x18 ./lib/perip/src/core.o
+                0x00000000000001d0                csr_msprint_string
  .text.fpioa_perips_out_set
-                0x00000000000002a8       0x14 ./lib/perip/src/fpioa.o
-                0x00000000000002a8                fpioa_perips_out_set
+                0x00000000000001e8       0x14 ./lib/perip/src/fpioa.o
+                0x00000000000001e8                fpioa_perips_out_set
  .text.uart_enable_ctrl
-                0x00000000000002bc       0x24 ./lib/perip/src/uart.o
-                0x00000000000002bc                uart_enable_ctrl
+                0x00000000000001fc       0x24 ./lib/perip/src/uart.o
+                0x00000000000001fc                uart_enable_ctrl
  .text.uart_band_ctrl
-                0x00000000000002e0       0x10 ./lib/perip/src/uart.o
-                0x00000000000002e0                uart_band_ctrl
+                0x0000000000000220       0x10 ./lib/perip/src/uart.o
+                0x0000000000000220                uart_band_ctrl
  .text._out_null
-                0x00000000000002f0        0x4 ./lib/driver/src/printf.o
+                0x0000000000000230        0x4 ./lib/driver/src/printf.o
  .text._ntoa_format
-                0x00000000000002f4      0x4d8 ./lib/driver/src/printf.o
+                0x0000000000000234      0x4d8 ./lib/driver/src/printf.o
  .text._out_char
-                0x00000000000007cc       0x20 ./lib/driver/src/printf.o
+                0x000000000000070c       0x20 ./lib/driver/src/printf.o
  .text._vsnprintf
-                0x00000000000007ec      0xd8c ./lib/driver/src/printf.o
+                0x000000000000072c      0xd8c ./lib/driver/src/printf.o
  .text.init_uart0_printf
-                0x0000000000001578       0x3c ./lib/driver/src/printf.o
-                0x0000000000001578                init_uart0_printf
- .text.printf_  0x00000000000015b4       0x50 ./lib/driver/src/printf.o
-                0x00000000000015b4                printf_
- .text.find_plate
-                0x0000000000001604      0x6a0 ./app/main.o
-                0x0000000000001604                find_plate
+                0x00000000000014b8       0x3c ./lib/driver/src/printf.o
+                0x00000000000014b8                init_uart0_printf
+ .text.printf_  0x00000000000014f4       0x50 ./lib/driver/src/printf.o
+                0x00000000000014f4                printf_
  .text.SysTick_Handler
-                0x0000000000001ca4        0x4 ./app/trap_handler.o
-                0x0000000000001ca4                SysTick_Handler
+                0x0000000000001544        0x4 ./app/trap_handler.o
+                0x0000000000001544                SysTick_Handler
  .text.HardFault_Handler
-                0x0000000000001ca8        0x4 ./app/trap_handler.o
-                0x0000000000001ca8                HardFault_Handler
+                0x0000000000001548        0x4 ./app/trap_handler.o
+                0x0000000000001548                HardFault_Handler
  .text.PLIC1_FPIOA_ELI0_Handler
-                0x0000000000001cac       0x98 ./app/trap_handler.o
-                0x0000000000001cac                PLIC1_FPIOA_ELI0_Handler
+                0x000000000000154c       0x98 ./app/trap_handler.o
+                0x000000000000154c                PLIC1_FPIOA_ELI0_Handler
  .text.PLIC2_FPIOA_ELI1_Handler
-                0x0000000000001d44       0x98 ./app/trap_handler.o
-                0x0000000000001d44                PLIC2_FPIOA_ELI1_Handler
+                0x00000000000015e4       0x98 ./app/trap_handler.o
+                0x00000000000015e4                PLIC2_FPIOA_ELI1_Handler
  .text.PLIC3_FPIOA_ELI2_Handler
-                0x0000000000001ddc       0x98 ./app/trap_handler.o
-                0x0000000000001ddc                PLIC3_FPIOA_ELI2_Handler
+                0x000000000000167c       0x98 ./app/trap_handler.o
+                0x000000000000167c                PLIC3_FPIOA_ELI2_Handler
  .text.PLIC4_FPIOA_ELI3_Handler
-                0x0000000000001e74       0x98 ./app/trap_handler.o
-                0x0000000000001e74                PLIC4_FPIOA_ELI3_Handler
+                0x0000000000001714       0x98 ./app/trap_handler.o
+                0x0000000000001714                PLIC4_FPIOA_ELI3_Handler
  .text.PLIC5_UART0_TX_Handler
-                0x0000000000001f0c       0x98 ./app/trap_handler.o
-                0x0000000000001f0c                PLIC5_UART0_TX_Handler
+                0x00000000000017ac       0x98 ./app/trap_handler.o
+                0x00000000000017ac                PLIC5_UART0_TX_Handler
  .text.PLIC6_UART0_RX_Handler
-                0x0000000000001fa4       0x98 ./app/trap_handler.o
-                0x0000000000001fa4                PLIC6_UART0_RX_Handler
+                0x0000000000001844       0x98 ./app/trap_handler.o
+                0x0000000000001844                PLIC6_UART0_RX_Handler
  .text.PLIC7_UART1_TX_Handler
-                0x000000000000203c       0x98 ./app/trap_handler.o
-                0x000000000000203c                PLIC7_UART1_TX_Handler
+                0x00000000000018dc       0x98 ./app/trap_handler.o
+                0x00000000000018dc                PLIC7_UART1_TX_Handler
  .text.PLIC8_UART1_RX_Handler
-                0x00000000000020d4       0x98 ./app/trap_handler.o
-                0x00000000000020d4                PLIC8_UART1_RX_Handler
+                0x0000000000001974       0x98 ./app/trap_handler.o
+                0x0000000000001974                PLIC8_UART1_RX_Handler
  .text.PLIC9_TIMER0_OF_Handler
-                0x000000000000216c       0x98 ./app/trap_handler.o
-                0x000000000000216c                PLIC9_TIMER0_OF_Handler
+                0x0000000000001a0c       0x98 ./app/trap_handler.o
+                0x0000000000001a0c                PLIC9_TIMER0_OF_Handler
  .text.PLIC10_SPI0_END_Handler
-                0x0000000000002204       0x98 ./app/trap_handler.o
-                0x0000000000002204                PLIC10_SPI0_END_Handler
+                0x0000000000001aa4       0x98 ./app/trap_handler.o
+                0x0000000000001aa4                PLIC10_SPI0_END_Handler
  .text.__udivdi3
-                0x000000000000229c      0x4b8 d:/mrs/mounriver_studio2/resources/app/resources/win32/components/wch/toolchain/risc-v embedded gcc12/bin/../lib/gcc/riscv-wch-elf/12.2.0/rv32im/ilp32\libgcc.a(_udivdi3.o)
-                0x000000000000229c                __udivdi3
+                0x0000000000001b3c      0x4b8 d:/mrs/mounriver_studio2/resources/app/resources/win32/components/wch/toolchain/risc-v embedded gcc12/bin/../lib/gcc/riscv-wch-elf/12.2.0/rv32im/ilp32\libgcc.a(_udivdi3.o)
+                0x0000000000001b3c                __udivdi3
  .text.__umoddi3
-                0x0000000000002754      0x478 d:/mrs/mounriver_studio2/resources/app/resources/win32/components/wch/toolchain/risc-v embedded gcc12/bin/../lib/gcc/riscv-wch-elf/12.2.0/rv32im/ilp32\libgcc.a(_umoddi3.o)
-                0x0000000000002754                __umoddi3
+                0x0000000000001ff4      0x478 d:/mrs/mounriver_studio2/resources/app/resources/win32/components/wch/toolchain/risc-v embedded gcc12/bin/../lib/gcc/riscv-wch-elf/12.2.0/rv32im/ilp32\libgcc.a(_umoddi3.o)
+                0x0000000000001ff4                __umoddi3
  *(.gnu.linkonce.t.*)
-                0x0000000000002bcc                . = ALIGN (0x4)
+                0x000000000000246c                . = ALIGN (0x4)
                 [!provide]                        PROVIDE (__etext = .)
                 [!provide]                        PROVIDE (_etext = .)
                 [!provide]                        PROVIDE (etext = .)
 
-.preinit_array  0x0000000000002bcc        0x0
+.preinit_array  0x000000000000246c        0x0
                 [!provide]                        PROVIDE (__preinit_array_start = .)
  *(.preinit_array)
                 [!provide]                        PROVIDE (__preinit_array_end = .)
 
-.init_array     0x0000000000002bcc        0x0
+.init_array     0x000000000000246c        0x0
                 [!provide]                        PROVIDE (__init_array_start = .)
  *(SORT_BY_INIT_PRIORITY(.init_array.*) SORT_BY_INIT_PRIORITY(.ctors.*))
  *(.init_array EXCLUDE_FILE(*crtend?.o *crtend.o *crtbegin?.o *crtbegin.o) .ctors)
                 [!provide]                        PROVIDE (__init_array_end = .)
 
-.fini_array     0x0000000000002bcc        0x0
+.fini_array     0x000000000000246c        0x0
                 [!provide]                        PROVIDE (__fini_array_start = .)
  *(SORT_BY_INIT_PRIORITY(.fini_array.*) SORT_BY_INIT_PRIORITY(.dtors.*))
  *(.fini_array EXCLUDE_FILE(*crtend?.o *crtend.o *crtbegin?.o *crtbegin.o) .dtors)
@@ -493,145 +517,131 @@ END GROUP
  *(SORT_BY_NAME(.dtors.*))
  *(.dtors)
 
-.lalign         0x0000000000002bcc        0x0
-                0x0000000000002bcc                . = ALIGN (0x4)
-                0x0000000000002bcc                PROVIDE (_data_lma = .)
+.lalign         0x000000000000246c        0x0
+                0x000000000000246c                . = ALIGN (0x4)
+                0x000000000000246c                PROVIDE (_data_lma = .)
 
-.dalign         0x0000000020000000        0x0 load address 0x0000000000002bcc
+.dalign         0x0000000020000000        0x0 load address 0x000000000000246c
                 0x0000000020000000                . = ALIGN (0x4)
                 0x0000000020000000                PROVIDE (_data = .)
 
-.data           0x0000000020000000      0x310 load address 0x0000000000002bcc
+.data           0x0000000020000000      0x1e8 load address 0x000000000000246c
  *(.rdata)
  *(.rodata .rodata.*)
  .rodata._vsnprintf
                 0x0000000020000000       0x44 ./lib/driver/src/printf.o
- .rodata.find_plate.str1.4
-                0x0000000020000044      0x117 ./app/main.o
- *fill*         0x000000002000015b        0x1 
  .rodata.main.str1.4
-                0x000000002000015c       0x12 ./app/main.o
- *fill*         0x000000002000016e        0x2 
+                0x0000000020000044        0x4 ./app/main.o
  .rodata.PLIC1_FPIOA_ELI0_Handler.str1.4
-                0x0000000020000170        0xd ./app/trap_handler.o
- *fill*         0x000000002000017d        0x3 
+                0x0000000020000048        0xd ./app/trap_handler.o
+ *fill*         0x0000000020000055        0x3 
  .rodata.PLIC2_FPIOA_ELI1_Handler.str1.4
-                0x0000000020000180        0xd ./app/trap_handler.o
- *fill*         0x000000002000018d        0x3 
+                0x0000000020000058        0xd ./app/trap_handler.o
+ *fill*         0x0000000020000065        0x3 
  .rodata.PLIC3_FPIOA_ELI2_Handler.str1.4
-                0x0000000020000190        0xd ./app/trap_handler.o
- *fill*         0x000000002000019d        0x3 
+                0x0000000020000068        0xd ./app/trap_handler.o
+ *fill*         0x0000000020000075        0x3 
  .rodata.PLIC4_FPIOA_ELI3_Handler.str1.4
-                0x00000000200001a0        0xd ./app/trap_handler.o
- *fill*         0x00000000200001ad        0x3 
+                0x0000000020000078        0xd ./app/trap_handler.o
+ *fill*         0x0000000020000085        0x3 
  .rodata.PLIC5_UART0_TX_Handler.str1.4
-                0x00000000200001b0        0xd ./app/trap_handler.o
- *fill*         0x00000000200001bd        0x3 
+                0x0000000020000088        0xd ./app/trap_handler.o
+ *fill*         0x0000000020000095        0x3 
  .rodata.PLIC6_UART0_RX_Handler.str1.4
-                0x00000000200001c0        0xd ./app/trap_handler.o
- *fill*         0x00000000200001cd        0x3 
+                0x0000000020000098        0xd ./app/trap_handler.o
+ *fill*         0x00000000200000a5        0x3 
  .rodata.PLIC7_UART1_TX_Handler.str1.4
-                0x00000000200001d0        0xd ./app/trap_handler.o
- *fill*         0x00000000200001dd        0x3 
+                0x00000000200000a8        0xd ./app/trap_handler.o
+ *fill*         0x00000000200000b5        0x3 
  .rodata.PLIC8_UART1_RX_Handler.str1.4
-                0x00000000200001e0        0xd ./app/trap_handler.o
- *fill*         0x00000000200001ed        0x3 
+                0x00000000200000b8        0xd ./app/trap_handler.o
+ *fill*         0x00000000200000c5        0x3 
  .rodata.PLIC9_TIMER0_OF_Handler.str1.4
-                0x00000000200001f0        0xd ./app/trap_handler.o
- *fill*         0x00000000200001fd        0x3 
+                0x00000000200000c8        0xd ./app/trap_handler.o
+ *fill*         0x00000000200000d5        0x3 
  .rodata.PLIC10_SPI0_END_Handler.str1.4
-                0x0000000020000200        0xe ./app/trap_handler.o
- *fill*         0x000000002000020e        0x2 
+                0x00000000200000d8        0xe ./app/trap_handler.o
+ *fill*         0x00000000200000e6        0x2 
  .rodata.__clz_tab
-                0x0000000020000210      0x100 d:/mrs/mounriver_studio2/resources/app/resources/win32/components/wch/toolchain/risc-v embedded gcc12/bin/../lib/gcc/riscv-wch-elf/12.2.0/rv32im/ilp32\libgcc.a(_clz.o)
-                0x0000000020000210                __clz_tab
+                0x00000000200000e8      0x100 d:/mrs/mounriver_studio2/resources/app/resources/win32/components/wch/toolchain/risc-v embedded gcc12/bin/../lib/gcc/riscv-wch-elf/12.2.0/rv32im/ilp32\libgcc.a(_clz.o)
+                0x00000000200000e8                __clz_tab
  *(.gnu.linkonce.r.*)
  *(.data .data.*)
  *(.gnu.linkonce.d.*)
-                0x0000000020000310                . = ALIGN (0x8)
-                0x0000000020000b10                PROVIDE (__global_pointer$ = (. + 0x800))
+                0x00000000200001e8                . = ALIGN (0x8)
+                0x00000000200009e8                PROVIDE (__global_pointer$ = (. + 0x800))
  *(.sdata .sdata.*)
  *(.gnu.linkonce.s.*)
-                0x0000000020000310                . = ALIGN (0x8)
+                0x00000000200001e8                . = ALIGN (0x8)
  *(.srodata.cst16)
  *(.srodata.cst8)
  *(.srodata.cst4)
  *(.srodata.cst2)
  *(.srodata .srodata.*)
 
-.rela.dyn       0x0000000020000310        0x0 load address 0x0000000000002edc
- .rela.init     0x0000000020000310        0x0 ./lib/startup/init.o
-                0x0000000020000310                . = ALIGN (0x4)
-                0x0000000020000310                PROVIDE (_edata = .)
+.rela.dyn       0x00000000200001e8        0x0 load address 0x0000000000002654
+ .rela.init     0x00000000200001e8        0x0 ./lib/startup/init.o
+                0x00000000200001e8                . = ALIGN (0x4)
+                0x00000000200001e8                PROVIDE (_edata = .)
                 [!provide]                        PROVIDE (edata = .)
                 [!provide]                        PROVIDE (_fbss = .)
-                0x0000000020000310                PROVIDE (__bss_start = .)
+                0x00000000200001e8                PROVIDE (__bss_start = .)
 
-.bss            0x0000000020000310       0x28
+.bss            0x00000000200001e8       0x14
  *(.sbss*)
  .sbss.system_vendorid
-                0x0000000020000310        0x4 ./lib/startup/init.o
-                0x0000000020000310                system_vendorid
+                0x00000000200001e8        0x4 ./lib/startup/init.o
+                0x00000000200001e8                system_vendorid
  .sbss.system_sram_size
-                0x0000000020000314        0x4 ./lib/startup/init.o
-                0x0000000020000314                system_sram_size
+                0x00000000200001ec        0x4 ./lib/startup/init.o
+                0x00000000200001ec                system_sram_size
  .sbss.system_iram_size
-                0x0000000020000318        0x4 ./lib/startup/init.o
-                0x0000000020000318                system_iram_size
+                0x00000000200001f0        0x4 ./lib/startup/init.o
+                0x00000000200001f0                system_iram_size
  .sbss.system_cpu_freqM
-                0x000000002000031c        0x4 ./lib/startup/init.o
-                0x000000002000031c                system_cpu_freqM
+                0x00000000200001f4        0x4 ./lib/startup/init.o
+                0x00000000200001f4                system_cpu_freqM
  .sbss.system_cpu_freq
-                0x0000000020000320        0x4 ./lib/startup/init.o
-                0x0000000020000320                system_cpu_freq
- .sbss.g_box_area
-                0x0000000020000324        0x4 ./app/main.o
- .sbss.g_box_y1
-                0x0000000020000328        0x4 ./app/main.o
- .sbss.g_box_x1
-                0x000000002000032c        0x4 ./app/main.o
- .sbss.g_box_y0
-                0x0000000020000330        0x4 ./app/main.o
- .sbss.g_box_x0
-                0x0000000020000334        0x4 ./app/main.o
+                0x00000000200001f8        0x4 ./lib/startup/init.o
+                0x00000000200001f8                system_cpu_freq
  *(.gnu.linkonce.sb.*)
  *(.bss .bss.*)
  *(.gnu.linkonce.b.*)
  *(COMMON)
-                0x0000000020000338                . = ALIGN (0x4)
-                0x0000000020000338                . = ALIGN (0x8)
-                0x0000000020000338                PROVIDE (_end = .)
+                0x00000000200001fc                . = ALIGN (0x4)
+                0x0000000020000200                . = ALIGN (0x8)
+                0x0000000020000200                PROVIDE (_end = .)
                 [!provide]                        PROVIDE (end = .)
 
-.stack          0x000000002003c000     0x4000 load address 0x0000000020000338
+.stack          0x000000002003c000     0x4000 load address 0x00000000200001fc
                 [!provide]                        PROVIDE (_heap_end = .)
                 0x0000000000004000                . = __stack_size
  *fill*         0x000000002003c000     0x4000 
                 0x0000000020040000                PROVIDE (_sp = .)
 OUTPUT(SparrowRV_APP.elf elf32-littleriscv)
 
-.debug_info     0x0000000000000000     0x326b
+.debug_info     0x0000000000000000     0x46e5
  .debug_info    0x0000000000000000      0x13c ./lib/startup/init.o
  .debug_info    0x000000000000013c       0x23 ./lib/startup/startup.o
  .debug_info    0x000000000000015f      0x464 ./lib/perip/src/core.o
  .debug_info    0x00000000000005c3      0x28a ./lib/perip/src/fpioa.o
  .debug_info    0x000000000000084d      0x24c ./lib/perip/src/uart.o
  .debug_info    0x0000000000000a99     0x13ed ./lib/driver/src/printf.o
- .debug_info    0x0000000000001e86     0x1198 ./app/main.o
- .debug_info    0x000000000000301e      0x24d ./app/trap_handler.o
+ .debug_info    0x0000000000001e86     0x2612 ./app/main.o
+ .debug_info    0x0000000000004498      0x24d ./app/trap_handler.o
 
-.debug_abbrev   0x0000000000000000      0xcbd
+.debug_abbrev   0x0000000000000000      0xde1
  .debug_abbrev  0x0000000000000000       0xc4 ./lib/startup/init.o
  .debug_abbrev  0x00000000000000c4       0x12 ./lib/startup/startup.o
  .debug_abbrev  0x00000000000000d6      0x1f4 ./lib/perip/src/core.o
  .debug_abbrev  0x00000000000002ca      0x12a ./lib/perip/src/fpioa.o
  .debug_abbrev  0x00000000000003f4      0x131 ./lib/perip/src/uart.o
  .debug_abbrev  0x0000000000000525      0x3f8 ./lib/driver/src/printf.o
- .debug_abbrev  0x000000000000091d      0x2fc ./app/main.o
- .debug_abbrev  0x0000000000000c19       0xa4 ./app/trap_handler.o
+ .debug_abbrev  0x000000000000091d      0x420 ./app/main.o
+ .debug_abbrev  0x0000000000000d3d       0xa4 ./app/trap_handler.o
 
 .debug_loclists
-                0x0000000000000000     0x37b8
+                0x0000000000000000     0x54af
  .debug_loclists
                 0x0000000000000000       0x18 ./lib/startup/init.o
  .debug_loclists
@@ -643,9 +653,9 @@ OUTPUT(SparrowRV_APP.elf elf32-littleriscv)
  .debug_loclists
                 0x0000000000000311     0x2196 ./lib/driver/src/printf.o
  .debug_loclists
-                0x00000000000024a7     0x1311 ./app/main.o
+                0x00000000000024a7     0x3008 ./app/main.o
 
-.debug_aranges  0x0000000000000000      0x2c0
+.debug_aranges  0x0000000000000000      0x308
  .debug_aranges
                 0x0000000000000000       0x20 ./lib/startup/init.o
  .debug_aranges
@@ -659,12 +669,12 @@ OUTPUT(SparrowRV_APP.elf elf32-littleriscv)
  .debug_aranges
                 0x0000000000000178       0x88 ./lib/driver/src/printf.o
  .debug_aranges
-                0x0000000000000200       0x48 ./app/main.o
+                0x0000000000000200       0x90 ./app/main.o
  .debug_aranges
-                0x0000000000000248       0x78 ./app/trap_handler.o
+                0x0000000000000290       0x78 ./app/trap_handler.o
 
 .debug_rnglists
-                0x0000000000000000      0xb05
+                0x0000000000000000     0x1404
  .debug_rnglists
                 0x0000000000000000       0x16 ./lib/startup/init.o
  .debug_rnglists
@@ -678,21 +688,21 @@ OUTPUT(SparrowRV_APP.elf elf32-littleriscv)
  .debug_rnglists
                 0x0000000000000195      0x496 ./lib/driver/src/printf.o
  .debug_rnglists
-                0x000000000000062b      0x461 ./app/main.o
+                0x000000000000062b      0xd60 ./app/main.o
  .debug_rnglists
-                0x0000000000000a8c       0x79 ./app/trap_handler.o
+                0x000000000000138b       0x79 ./app/trap_handler.o
 
-.debug_line     0x0000000000000000     0x4b10
+.debug_line     0x0000000000000000     0x7e11
  .debug_line    0x0000000000000000      0x15d ./lib/startup/init.o
  .debug_line    0x000000000000015d      0x181 ./lib/startup/startup.o
  .debug_line    0x00000000000002de      0x511 ./lib/perip/src/core.o
  .debug_line    0x00000000000007ef      0x41e ./lib/perip/src/fpioa.o
  .debug_line    0x0000000000000c0d      0x2e4 ./lib/perip/src/uart.o
  .debug_line    0x0000000000000ef1     0x21bc ./lib/driver/src/printf.o
- .debug_line    0x00000000000030ad     0x1728 ./app/main.o
- .debug_line    0x00000000000047d5      0x33b ./app/trap_handler.o
+ .debug_line    0x00000000000030ad     0x4a29 ./app/main.o
+ .debug_line    0x0000000000007ad6      0x33b ./app/trap_handler.o
 
-.debug_str      0x0000000000000000      0x8ab
+.debug_str      0x0000000000000000      0x8d9
  .debug_str     0x0000000000000000      0x193 ./lib/startup/init.o
                                         0x1d0 (size before relaxing)
  .debug_str     0x0000000000000193       0x4d ./lib/startup/startup.o
@@ -704,9 +714,9 @@ OUTPUT(SparrowRV_APP.elf elf32-littleriscv)
                                         0x218 (size before relaxing)
  .debug_str     0x00000000000004e4      0x1a7 ./lib/driver/src/printf.o
                                         0x387 (size before relaxing)
- .debug_str     0x000000000000068b      0x10e ./app/main.o
-                                        0x2b4 (size before relaxing)
- .debug_str     0x0000000000000799      0x112 ./app/trap_handler.o
+ .debug_str     0x000000000000068b      0x13c ./app/main.o
+                                        0x2dc (size before relaxing)
+ .debug_str     0x00000000000007c7      0x112 ./app/trap_handler.o
                                         0x274 (size before relaxing)
 
 .debug_line_str
@@ -774,11 +784,11 @@ OUTPUT(SparrowRV_APP.elf elf32-littleriscv)
  .riscv.attributes
                 0x00000000000001a2       0x2a d:/mrs/mounriver_studio2/resources/app/resources/win32/components/wch/toolchain/risc-v embedded gcc12/bin/../lib/gcc/riscv-wch-elf/12.2.0/rv32im/ilp32\libgcc.a(_clz.o)
 
-.debug_frame    0x0000000000000000      0x900
+.debug_frame    0x0000000000000000      0xa60
  .debug_frame   0x0000000000000000       0x20 ./lib/startup/init.o
  .debug_frame   0x0000000000000020       0xe0 ./lib/perip/src/core.o
  .debug_frame   0x0000000000000100       0xb0 ./lib/perip/src/fpioa.o
  .debug_frame   0x00000000000001b0       0x80 ./lib/perip/src/uart.o
  .debug_frame   0x0000000000000230      0x1b8 ./lib/driver/src/printf.o
- .debug_frame   0x00000000000003e8      0x150 ./app/main.o
- .debug_frame   0x0000000000000538      0x3c8 ./app/trap_handler.o
+ .debug_frame   0x00000000000003e8      0x2b0 ./app/main.o
+ .debug_frame   0x0000000000000698      0x3c8 ./app/trap_handler.o

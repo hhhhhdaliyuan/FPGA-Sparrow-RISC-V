@@ -112,3 +112,248 @@ dev_map
 pnr 
 report_timing 
 gen_bit_stream 
+remove_design -force -verilog "D:/PDS/test/Sparrow_RISC-V/rtl_ov5640/image_process/morph_close_1x11.v"
+remove_design -force -verilog "D:/PDS/test/Sparrow_RISC-V/rtl_ov5640/image_process/morph_rect_1x11.v"
+set_arch -family Logos2 -device PG2L100H -speedgrade -6 -package FBG676
+compile -top_module system_top
+synthesize -ads -selected_syn_tool_opt 2 
+dev_map 
+pnr 
+report_timing 
+gen_bit_stream 
+set_arch -family Logos2 -device PG2L100H -speedgrade -6 -package FBG676
+compile -top_module system_top
+synthesize -ads -selected_syn_tool_opt 2 
+set_arch -family Logos2 -device PG2L100H -speedgrade -6 -package FBG676
+compile -top_module system_top
+synthesize -ads -selected_syn_tool_opt 2 
+dev_map 
+pnr 
+report_timing 
+gen_bit_stream 
+set_arch -family Logos2 -device PG2L100H -speedgrade -6 -package FBG676
+compile -top_module system_top
+synthesize -ads -selected_syn_tool_opt 2 
+dev_map 
+pnr 
+report_timing 
+gen_bit_stream 
+set_arch -family Logos2 -device PG2L100H -speedgrade -6 -package FBG676
+compile -top_module system_top
+synthesize -ads -selected_syn_tool_opt 2 
+dev_map 
+pnr 
+report_timing 
+gen_bit_stream 
+set_arch -family Logos2 -device PG2L100H -speedgrade -6 -package FBG676
+compile -top_module system_top
+synthesize -ads -selected_syn_tool_opt 2 
+dev_map 
+pnr 
+report_timing 
+gen_bit_stream 
+set_arch -family Logos2 -device PG2L100H -speedgrade -6 -package FBG676
+compile -top_module system_top
+synthesize -ads -selected_syn_tool_opt 2 
+dev_map 
+pnr 
+report_timing 
+gen_bit_stream 
+set_arch -family Logos2 -device PG2L100H -speedgrade -6 -package FBG676
+compile -top_module system_top
+synthesize -ads -selected_syn_tool_opt 2 
+dev_map 
+pnr 
+report_timing 
+gen_bit_stream 
+set_arch -family Logos2 -device PG2L100H -speedgrade -6 -package FBG676
+compile -top_module system_top
+set_arch -family Logos2 -device PG2L100H -speedgrade -6 -package FBG676
+compile -top_module system_top
+synthesize -ads -selected_syn_tool_opt 2 
+dev_map 
+pnr 
+report_timing 
+gen_bit_stream 
+set_arch -family Logos2 -device PG2L100H -speedgrade -6 -package FBG676
+compile -top_module system_top
+synthesize -ads -selected_syn_tool_opt 2 
+dev_map 
+pnr 
+report_timing 
+gen_bit_stream 
+set_arch -family Logos2 -device PG2L100H -speedgrade -6 -package FBG676
+compile -top_module system_top
+synthesize -ads -selected_syn_tool_opt 2 
+set_arch -family Logos2 -device PG2L100H -speedgrade -6 -package FBG676
+compile -top_module system_top
+synthesize -ads -selected_syn_tool_opt 2 
+dev_map 
+pnr 
+report_timing 
+gen_bit_stream 
+set_arch -family Logos2 -device PG2L100H -speedgrade -6 -package FBG676
+compile -top_module system_top
+synthesize -ads -selected_syn_tool_opt 2 
+dev_map 
+pnr 
+set_arch -family Logos2 -device PG2L100H -speedgrade -6 -package FBG676
+compile -top_module system_top
+synthesize -ads -selected_syn_tool_opt 2 
+dev_map 
+pnr 
+report_timing 
+gen_bit_stream 
+set_arch -family Logos2 -device PG2L100H -speedgrade -6 -package FBG676
+compile -top_module system_top
+synthesize -ads -selected_syn_tool_opt 2 
+dev_map 
+pnr 
+pnr 
+report_timing 
+gen_bit_stream 
+set_arch -family Logos2 -device PG2L100H -speedgrade -6 -package FBG676
+compile -top_module system_top
+synthesize -ads -selected_syn_tool_opt 2 
+dev_map 
+pnr 
+report_timing 
+gen_bit_stream 
+set_arch -family Logos2 -device PG2L100H -speedgrade -6 -package FBG676
+compile -top_module system_top
+synthesize -ads -selected_syn_tool_opt 2 
+dev_map 
+pnr 
+report_timing 
+gen_bit_stream 
+set_arch -family Logos2 -device PG2L100H -speedgrade -6 -package FBG676
+compile -top_module system_top
+synthesize -ads -selected_syn_tool_opt 2 
+dev_map 
+pnr 
+report_timing 
+gen_bit_stream 
+set_arch -family Logos2 -device PG2L100H -speedgrade -6 -package FBG676
+compile -top_module system_top
+synthesize -ads -selected_syn_tool_opt 2 
+dev_map 
+pnr 
+report_timing 
+gen_bit_stream 
+set_arch -family Logos2 -device PG2L100H -speedgrade -6 -package FBG676
+compile -top_module system_top
+synthesize -ads -selected_syn_tool_opt 2 
+dev_map 
+pnr 
+report_timing 
+gen_bit_stream 
+set_arch -family Logos2 -device PG2L100H -speedgrade -6 -package FBG676
+compile -top_module system_top
+synthesize -ads -selected_syn_tool_opt 2 
+dev_map 
+pnr 
+report_timing 
+gen_bit_stream 
+set_arch -family Logos2 -device PG2L100H -speedgrade -6 -package FBG676
+compile -top_module system_top
+synthesize -ads -selected_syn_tool_opt 2 
+dev_map 
+pnr 
+report_timing 
+gen_bit_stream 
+set_arch -family Logos2 -device PG2L100H -speedgrade -6 -package FBG676
+compile -top_module system_top
+synthesize -ads -selected_syn_tool_opt 2 
+dev_map 
+pnr 
+report_timing 
+gen_bit_stream 
+set_arch -family Logos2 -device PG2L100H -speedgrade -6 -package FBG676
+compile -top_module system_top
+synthesize -ads -selected_syn_tool_opt 2 
+dev_map 
+pnr 
+report_timing 
+gen_bit_stream 
+set_arch -family Logos2 -device PG2L100H -speedgrade -6 -package FBG676
+compile -top_module system_top
+synthesize -ads -selected_syn_tool_opt 2 
+dev_map 
+pnr 
+report_timing 
+gen_bit_stream 
+set_arch -family Logos2 -device PG2L100H -speedgrade -6 -package FBG676
+compile -top_module system_top
+synthesize -ads -selected_syn_tool_opt 2 
+dev_map 
+pnr 
+report_timing 
+gen_bit_stream 
+set_arch -family Logos2 -device PG2L100H -speedgrade -6 -package FBG676
+compile -top_module system_top
+synthesize -ads -selected_syn_tool_opt 2 
+dev_map 
+pnr 
+report_timing 
+gen_bit_stream 
+set_arch -family Logos2 -device PG2L100H -speedgrade -6 -package FBG676
+compile -top_module system_top
+synthesize -ads -selected_syn_tool_opt 2 
+dev_map 
+pnr 
+report_timing 
+gen_bit_stream 
+set_arch -family Logos2 -device PG2L100H -speedgrade -6 -package FBG676
+compile -top_module system_top
+synthesize -ads -selected_syn_tool_opt 2 
+dev_map 
+pnr 
+set_arch -family Logos2 -device PG2L100H -speedgrade -6 -package FBG676
+compile -top_module system_top
+synthesize -ads -selected_syn_tool_opt 2 
+dev_map 
+pnr 
+report_timing 
+gen_bit_stream 
+set_arch -family Logos2 -device PG2L100H -speedgrade -6 -package FBG676
+compile -top_module system_top
+synthesize -ads -selected_syn_tool_opt 2 
+dev_map 
+pnr 
+report_timing 
+gen_bit_stream 
+set_arch -family Logos2 -device PG2L100H -speedgrade -6 -package FBG676
+compile -top_module system_top
+synthesize -ads -selected_syn_tool_opt 2 
+dev_map 
+pnr 
+report_timing 
+gen_bit_stream 
+set_arch -family Logos2 -device PG2L100H -speedgrade -6 -package FBG676
+compile -top_module system_top
+synthesize -ads -selected_syn_tool_opt 2 
+dev_map 
+pnr 
+report_timing 
+gen_bit_stream 
+set_arch -family Logos2 -device PG2L100H -speedgrade -6 -package FBG676
+compile -top_module system_top
+synthesize -ads -selected_syn_tool_opt 2 
+dev_map 
+pnr 
+report_timing 
+gen_bit_stream 
+set_arch -family Logos2 -device PG2L100H -speedgrade -6 -package FBG676
+compile -top_module system_top
+synthesize -ads -selected_syn_tool_opt 2 
+dev_map 
+pnr 
+report_timing 
+gen_bit_stream 
+set_arch -family Logos2 -device PG2L100H -speedgrade -6 -package FBG676
+compile -top_module system_top
+synthesize -ads -selected_syn_tool_opt 2 
+dev_map 
+pnr 
+report_timing 
+gen_bit_stream 

@@ -1,0 +1,207 @@
+// ============================================================
+// BFS_环形队列.c — 改进版BFS连通域分析
+// 修改点:
+//   1. 环形队列 (Q_SIZE=4096, 2的幂) — 队列空间循环复用
+//   2. 32位队列项: entry = (y<<11) | x, 一次DDR读写
+//   3. visited位图 (uint32_t*, 32像素/字)
+//   4. 队列满时标记溢出, 不截断后继续使用错误数据
+//   5. 8邻域蔓延
+//   6. 投影法精修边界 (保留)
+// ============================================================
+
+#include <stdint.h>
+#include "core.h"
+#include "system.h"
+#include "uart.h"
+#include "printf.h"
+
+#define FRAME_FREEZE_ADDR 0x40000400
+#define DDR_BIN_FRAME     0xA0000000
+#define DDR_RAW_FRAME     0xA4000000
+#define DDR_STRIDE32      960
+#define IMG_W             1920
+#define IMG_H             1080
+#define SCAN_Y0           100
+#define SCAN_Y1           (IMG_H-31)
+#define PIPE_DX           27
+#define PIPE_DY           5
+#define PIPE_DY_BOT       10
+#define EDGE_M            3
+
+// BFS参数
+#define Q_SIZE            4096       // 2的幂 (环形队列)
+#define Q_MASK            (Q_SIZE-1)
+#define MIN_AREA          500
+#define MIN_W             60
+#define MIN_H             10
+#define MAX_BLOB_AREA     80000
+
+// DDR: 队列 + visited位图
+#define DDR_QUEUE ((volatile uint32_t*)0xA0800000)  // 环形队列 (4096*4B=16KB)
+#define DDR_VIS   ((volatile uint32_t*)0xA0840000)  // visited位图 (每像素1bit)
+#define VIS_WORDS_PER_ROW  (IMG_W / 32)             // 每行60字
+
+// 行投影/列投影 (给精修用)
+#define DDR_RSUM  ((volatile int*)0xA0880000)
+#define DDR_CSUM  ((volatile int*)0xA0900000)
+
+static int g_x0,g_y0,g_x1,g_y1,g_area;
+static int g_tlx,g_tly,g_trx,g_try,g_blx,g_bly,g_brx,g_bry;
+static uint32_t lb_buf[960];    // 行缓存 SRAM
+
+void delay(uint32_t c){for(volatile uint32_t i=0;i<c;i++);}
+static inline void freeze(void){*(volatile uint32_t*)FRAME_FREEZE_ADDR=1;}
+static inline void unfreeze(void){*(volatile uint32_t*)FRAME_FREEZE_ADDR=0;}
+void uart_byte(uint8_t c){uart_send_date(UART0,c);for(volatile int n=0;n<200;n++);}
+void uart16(uint16_t v){uart_byte((v>>8)&0xFF);uart_byte(v&0xFF);}
+
+// ----- 二值图访问 (32位总线) -----
+static inline int is_white(volatile uint32_t* b,int x,int y){
+    uint32_t w=b[y*DDR_STRIDE32+(x>>1)];
+    return((int)((x&1)?(w>>16):(w&0xFFFF)) > 0x8000);
+}
+
+// ----- visited位图 (uint32_t*, 32像素/字) -----
+static inline void vis_set(int x,int y){
+    volatile uint32_t* p = DDR_VIS + y*VIS_WORDS_PER_ROW + (x>>5);
+    *p = *p | ((uint32_t)1 << (x & 0x1F));
+}
+static inline int vis_get(int x,int y){
+    volatile uint32_t* p = DDR_VIS + y*VIS_WORDS_PER_ROW + (x>>5);
+    return (int)((*p >> (x & 0x1F)) & 1);
+}
+static inline void vis_clr_scan(void){
+    for(int y=SCAN_Y0; y<=SCAN_Y1; y++){
+        volatile uint32_t* row = DDR_VIS + y*VIS_WORDS_PER_ROW;
+        for(int i=0;i<VIS_WORDS_PER_ROW;i++) row[i]=0;
+    }
+}
+
+// ----- 编码/解码 32位队列项 (y<<11 | x) -----
+#define ENC(x,y)  ((uint32_t)(((y)<<11) | (x)))
+#define DEC_X(e)  ((int)((e) & 0x7FF))
+#define DEC_Y(e)  ((int)((e) >> 11))
+
+// ============================================================
+// BFS_环形队列 — 找最大车牌候选
+// ============================================================
+void find_plate_bfs(void){
+    printf("[BFS]\r\n");
+    volatile uint32_t* bin=(volatile uint32_t*)DDR_BIN_FRAME;
+    volatile uint32_t* queue=DDR_QUEUE;   // 环形队列
+    volatile int* rsum=DDR_RSUM;
+    volatile int* csum=DDR_CSUM;
+
+    // 清零
+    for(int i=SCAN_Y0;i<=SCAN_Y1;i++)rsum[i]=0;
+    for(int i=0;i<IMG_W;i++)csum[i]=0;
+    vis_clr_scan();
+
+    int best=0,bx0=0,by0=0,bx1=0,by1=0,tot=0;
+    int btl=0,btt=0,btr=0,btt2=0,bbl=0,bbb=0,bbr=0,bbb2=0;
+
+    for(int y=SCAN_Y0;y<=SCAN_Y1;y++){
+        for(int x=0;x<IMG_W;x++){
+            if(!is_white(bin,x,y))continue;
+            if(vis_get(x,y))continue;
+            tot++;
+
+            int head=0,tail=0,area=0;
+            int mnx=x,mxx=x,mny=y,mxy=y;
+            int tlx=x,tly=y,trx=x,try_=y,blx=x,bly=y,brx=x,bry=y;
+            int overflow=0;
+
+            // 入队起点
+            queue[tail]=ENC(x,y); tail=(tail+1)&Q_MASK; area++;
+            vis_set(x,y);
+
+            while(head!=tail && !overflow){
+                uint32_t ent=queue[head]; head=(head+1)&Q_MASK;
+                int cx=DEC_X(ent),cy=DEC_Y(ent);
+
+                // 极值角点追踪
+                if(cx+cy<tlx+tly){tlx=cx;tly=cy;}
+                if(cx-cy>trx-try_){trx=cx;try_=cy;}
+                if(cy-cx>bly-blx){blx=cx;bly=cy;}
+                if(cx+cy>brx+bry){brx=cx;bry=cy;}
+
+                // 8邻域
+                #define ENQ(nx,ny) do{\
+                    if((ny)>=SCAN_Y0&&(ny)<=SCAN_Y1&&(nx)>=0&&(nx)<IMG_W\
+                       &&!vis_get(nx,ny)&&is_white(bin,nx,ny)){\
+                        vis_set(nx,ny);\
+                        uint32_t nxt=(tail+1)&Q_MASK;\
+                        if(nxt==head){overflow=1;}\
+                        else{queue[tail]=ENC(nx,ny);tail=nxt;area++;\
+                            if((nx)<mnx)mnx=(nx);if((nx)>mxx)mxx=(nx);\
+                            if((ny)<mny)mny=(ny);if((ny)>mxy)mxy=(ny);\
+                        }\
+                    }\
+                }while(0)
+                ENQ(cx,cy-1);ENQ(cx,cy+1);
+                ENQ(cx-1,cy);ENQ(cx+1,cy);
+                ENQ(cx-1,cy-1);ENQ(cx+1,cy-1);
+                ENQ(cx-1,cy+1);ENQ(cx+1,cy+1);
+                #undef ENQ
+
+                if(area>=MAX_BLOB_AREA)overflow=1;
+            }
+
+            // 溢出的区域不要 (可能是背景大海绵)
+            if(overflow)continue;
+
+            if(area>best&&area>=MIN_AREA){
+                int dw=trx-tlx,dw2=try_-tly,dd=blx-tlx,dd2=bly-tly;
+                int w2=dw*dw+dw2*dw2,h2=dd*dd+dd2*dd2;
+                if(w2>=3600&&h2>=100&&w2>=h2*4&&w2<=h2*36){
+                    best=ar;bx0=mnx;bx1=mxx;by0=mny;by1=mxy;
+                    btl=tlx;btt=tly;btr=trx;btt2=try_;
+                    bbl=blx;bbb=bly;bbr=brx;bbb2=bry;
+                }
+            }
+        }
+    }
+
+    printf("tot=%d best=%d\r\n",tot,best);
+    if(best<MIN_AREA){printf("no\r\n");return;}
+
+    // 窗口精修四个角: 在BFS极值点周围±15px窗口内找最外白像素
+    // 保留倾斜信息(左上/右上Y不同)
+    #define WIN_R  15
+    // 精修左上: 从(tlx-WIN_R, tly-WIN_R)向右下搜索
+    int r_tlx=btl,r_tly=btt;
+    for(int dy=0;dy<=WIN_R*2;dy++)for(int dx=0;dx<=WIN_R*2;dx++){
+        int sx=btl-WIN_R+dx,sy=btt-WIN_R+dy;
+        if(sx>=0&&sy>=0&&is_white(bin,sx,sy)){r_tlx=sx;r_tly=sy;dx=WIN_R*2+1;break;}
+    }
+    // 精修右上
+    int r_trx=btr,r_try=btt2;
+    for(int dy=0;dy<=WIN_R*2;dy++)for(int dx=0;dx<=WIN_R*2;dx++){
+        int sx=btr+WIN_R-dx,sy=btt2-WIN_R+dy;
+        if(sx<IMG_W&&sy>=0&&is_white(bin,sx,sy)){r_trx=sx;r_try=sy;dx=WIN_R*2+1;break;}
+    }
+    // 精修左下
+    int r_blx=bbl,r_bly=bbb;
+    for(int dy=0;dy<=WIN_R*2;dy++)for(int dx=0;dx<=WIN_R*2;dx++){
+        int sx=bbl-WIN_R+dx,sy=bbb+WIN_R-dy;
+        if(sx>=0&&sy<IMG_H&&is_white(bin,sx,sy)){r_blx=sx;r_bly=sy;dx=WIN_R*2+1;break;}
+    }
+    // 精修右下
+    int r_brx=bbr,r_bry=bbb2;
+    for(int dy=0;dy<=WIN_R*2;dy++)for(int dx=0;dx<=WIN_R*2;dx++){
+        int sx=bbr+WIN_R-dx,sy=bbb2+WIN_R-dy;
+        if(sx<IMG_W&&sy<IMG_H&&is_white(bin,sx,sy)){r_brx=sx;r_bry=sy;dx=WIN_R*2+1;break;}
+    }
+
+    g_x0=r_tlx;g_y0=r_tly;g_x1=r_brx;g_y1=r_bry;
+    g_area=(r_brx-r_tlx+1)*(r_bry-r_tly+1);
+    g_tlx=r_tlx;g_tly=r_tly;g_trx=r_trx;g_try=r_try;
+    g_blx=r_blx;g_bly=r_bly;g_brx=r_brx;g_bry=r_bry;
+
+    printf("1.BFS:\r\n");
+    printf("  TL%d,%d TR%d,%d\r\n",btl,btt,btr,btt2);
+    printf("  BL%d,%d BR%d,%d\r\n",bbl,bbb,bbr,bbb2);
+    printf("2.refine:\r\n");
+    printf("  TL%d,%d TR%d,%d\r\n",r_tlx,r_tly,r_trx,r_try);
+    printf("  BL%d,%d BR%d,%d\r\n",r_blx,r_bly,r_brx,r_bry);
+}
